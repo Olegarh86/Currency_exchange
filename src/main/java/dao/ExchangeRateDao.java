@@ -1,0 +1,139 @@
+package dao;
+
+import dao.util.ConnectionManager;
+import dto.CurrenciesFilter;
+import exception.DaoException;
+import model.Currency;
+import model.ExchangeRate;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
+    private final static ExchangeRateDao INSTANCE = new ExchangeRateDao();
+    private static final String INSERT_SQL = """
+            INSERT INTO exchange_rate (base_currency_id, target_currency_id, rate) 
+            VALUES (?, ?, ?)
+            """;
+    private static final String UPDATE_SQL = """
+            UPDATE exchange_rate
+            SET base_currency_id = ?, target_currency_id = ?,  rate = ?
+            WHERE id = ?
+            """;
+    private static final String FIND_ALL_SQL = """
+            SELECT e.id, base_currency_id, target_currency_id, rate, c.id, c.code, c.full_name, c.sign
+            FROM exchange_rate e
+            LEFT JOIN currency c ON e.base_currency_id = c.id
+            """;
+    private static final String FIND_BY_ID_SQL = FIND_ALL_SQL + " WHERE id = ?";
+    private static final String FIND_EXCHANGE_RATE_BY_CODES_SQL = FIND_ALL_SQL + """
+             Where base_currency_id = ? AND target_currency_id = ?
+            """;
+    private final CurrencyDao currencyDao = CurrencyDao.getInstance();
+
+    private ExchangeRateDao() {
+    }
+
+    public static ExchangeRateDao getInstance() {
+        return INSTANCE;
+    }
+
+    @Override
+    public ExchangeRate save(ExchangeRate exchangeRate) {
+        try (Connection connection = ConnectionManager.get()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setObject(1, exchangeRate.getBaseCurrencyId());
+            preparedStatement.setObject(2, exchangeRate.getTargetCurrencyId());
+            preparedStatement.setBigDecimal(3, exchangeRate.getRate());
+            preparedStatement.executeUpdate();
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+            if (resultSet.next()) {
+                exchangeRate.setId(resultSet.getInt(1));
+                return exchangeRate;
+            }
+            throw new DaoException("Обменный курс не сохранен");
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+    }
+
+    @Override
+    public void update(ExchangeRate exchangeRate) {
+        try (Connection connection = ConnectionManager.get();
+             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
+            preparedStatement.setInt(1, exchangeRate.getBaseCurrencyId());
+            preparedStatement.setInt(2, exchangeRate.getTargetCurrencyId());
+            preparedStatement.setBigDecimal(3, exchangeRate.getRate());
+            preparedStatement.setInt(4, exchangeRate.getId());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+    }
+
+    @Override
+    public Optional<ExchangeRate> findById(Integer id) {
+        try (Connection connection = ConnectionManager.get();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            ExchangeRate exchangeRate = null;
+            if (resultSet.next()) {
+                exchangeRate = buildExchangeRate(resultSet);
+            }
+            return Optional.ofNullable(exchangeRate);
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+    }
+
+    private Currency buildCurrency(ResultSet resultSet, String currency) throws SQLException {
+        return currencyDao.findById(resultSet.getInt(currency),
+                resultSet.getStatement().getConnection()).orElse(null);
+    }
+
+    @Override
+    public List<ExchangeRate> findAll() {
+        List<ExchangeRate> exchangeRates = new ArrayList<>();
+        try (Connection connection = ConnectionManager.get();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                exchangeRates.add(buildExchangeRate(resultSet));
+            }
+            return exchangeRates;
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+    }
+
+    public List<ExchangeRate> findAll(CurrenciesFilter filter) {
+        List<Integer> parameters = new ArrayList<>();
+        parameters.add(currencyDao.findCurrencyIdByCode(filter.base_currency_code()));
+        parameters.add(currencyDao.findCurrencyIdByCode(filter.target_currency_code()));
+        try (Connection connection = ConnectionManager.get();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_EXCHANGE_RATE_BY_CODES_SQL)) {
+            for (int i = 0; i < parameters.size(); i++) {
+                preparedStatement.setInt(i + 1, parameters.get(i));
+            }
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<ExchangeRate> exchangeRates = new ArrayList<>();
+            while (resultSet.next()) {
+                exchangeRates.add(buildExchangeRate(resultSet));
+            }
+
+            return exchangeRates;
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+    }
+
+    private static ExchangeRate buildExchangeRate(ResultSet resultSet) throws SQLException {
+        return new ExchangeRate(resultSet.getInt("id"),
+                resultSet.getInt("base_currency_id"),
+                resultSet.getInt("target_currency_id"),
+                resultSet.getBigDecimal("rate"));
+    }
+}
