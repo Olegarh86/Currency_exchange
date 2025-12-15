@@ -1,7 +1,8 @@
 target/
 !**/src/main/**/target/
 !**/src/test/**/target/
-application.properties
+*.properties
+
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
