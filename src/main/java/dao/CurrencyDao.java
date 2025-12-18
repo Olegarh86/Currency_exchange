@@ -112,7 +112,7 @@ public class CurrencyDao implements Dao<Integer, Currency> {
         return Optional.empty();
     }
 
-    public int findCurrencyIdByCode(String code) {
+    public int findIdByCode(String code) {
         try (Connection connection = ConnectionManager.get();
         PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_CODE_SQL)) {
             preparedStatement.setString(1, code);

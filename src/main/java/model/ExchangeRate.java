@@ -1,5 +1,7 @@
 package model;
 
+import dao.CurrencyDao;
+
 import java.math.BigDecimal;
 
 public class ExchangeRate {
@@ -7,6 +9,7 @@ public class ExchangeRate {
     private int baseCurrencyId;
     private int targetCurrencyId;
     private BigDecimal rate;
+    private final CurrencyDao currency = CurrencyDao.getInstance();
 
     public ExchangeRate(int id, int baseCurrency, int targetCurrency, BigDecimal rate) {
         this.id = id;
@@ -55,11 +58,9 @@ public class ExchangeRate {
 
     @Override
     public String toString() {
-        return "ExchangeRate{" +
-               "id=" + id +
-               ", baseCurrency=" + baseCurrencyId +
-               ", targetCurrency=" + targetCurrencyId +
-               ", rate=" + rate +
-               '}';
+        return "\n  id : " + id +
+               ",\n  baseCurrency : " + currency.findById(baseCurrencyId).get() +
+               ",\n  targetCurrency : " + currency.findById(targetCurrencyId).get() +
+               ",\n  rate : " + rate;
     }
 }

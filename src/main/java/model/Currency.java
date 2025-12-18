@@ -4,18 +4,19 @@ public class Currency {
     private int id;
     private String code;
     private String fullName;
+    private String sign;
 
     public Currency(int id, String code, String fullName, String sign) {
         this.id = id;
         this.code = code;
         this.fullName = fullName;
-        Sign = sign;
+        this.sign = sign;
     }
 
     public Currency(String code, String fullName, String sign) {
         this.code = code;
         this.fullName = fullName;
-        Sign = sign;
+        this.sign = sign;
     }
 
     public int getId() {
@@ -43,22 +44,20 @@ public class Currency {
     }
 
     public String getSign() {
-        return Sign;
+        return sign;
     }
 
     public void setSign(String sign) {
-        Sign = sign;
+        this.sign = sign;
     }
-
-    private String Sign;
 
     @Override
     public String toString() {
-        return "Currency{" +
-               "id=" + id +
-               ", code='" + code + '\'' +
-               ", fullName='" + fullName + '\'' +
-               ", Sign='" + Sign + '\'' +
+        return "{\n" +
+               "    id : " + id +
+               ",\n    name : '" + fullName + '\'' +
+               ",\n    code : '" + code + '\'' +
+               ",\n    sign : '" + sign + '\'' +
                '}';
     }
 }

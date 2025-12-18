@@ -1,11 +1,12 @@
 package dao;
 
 import dao.util.ConnectionManager;
-import dto.CurrenciesFilter;
+import dto.FindExchangeRateByIdDto;
 import exception.DaoException;
 import model.Currency;
 import model.ExchangeRate;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,11 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
             UPDATE exchange_rate
             SET base_currency_id = ?, target_currency_id = ?,  rate = ?
             WHERE id = ?
+            """;
+    private static final String UPDATE_RATE_SQL = """
+            UPDATE exchange_rate
+            SET rate = ?
+            WHERE base_currency_id = ? and target_currency_id = ?
             """;
     private static final String FIND_ALL_SQL = """
             SELECT e.id, base_currency_id, target_currency_id, rate, c.id, c.code, c.full_name, c.sign
@@ -73,6 +79,18 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
         }
     }
 
+    public void updateRate(int baseCurrencyId, int targetCurrencyId,  BigDecimal rate) {
+        try (Connection connection = ConnectionManager.get();
+             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_RATE_SQL)) {
+            preparedStatement.setBigDecimal(1, rate);
+            preparedStatement.setInt(2, baseCurrencyId);
+            preparedStatement.setInt(3, targetCurrencyId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+    }
+
     @Override
     public Optional<ExchangeRate> findById(Integer id) {
         try (Connection connection = ConnectionManager.get();
@@ -109,10 +127,10 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
         }
     }
 
-    public List<ExchangeRate> findAll(CurrenciesFilter filter) {
+    public List<ExchangeRate> findPair(FindExchangeRateByIdDto filter) {
         List<Integer> parameters = new ArrayList<>();
-        parameters.add(currencyDao.findCurrencyIdByCode(filter.base_currency_code()));
-        parameters.add(currencyDao.findCurrencyIdByCode(filter.target_currency_code()));
+        parameters.add(currencyDao.findIdByCode(filter.base_currency_code()));
+        parameters.add(currencyDao.findIdByCode(filter.target_currency_code()));
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_EXCHANGE_RATE_BY_CODES_SQL)) {
             for (int i = 0; i < parameters.size(); i++) {

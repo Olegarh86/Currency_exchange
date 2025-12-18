@@ -1,21 +1,18 @@
 package dao;
 
-import dto.CurrenciesFilter;
+import dto.FindExchangeRateByIdDto;
 import model.Currency;
 import model.ExchangeRate;
 
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.sql.Driver;
 import java.util.List;
 import java.util.Optional;
 
 public class DaoRunner {
     public static void main(String[] args) {
-        CurrenciesFilter filter = new CurrenciesFilter("USD", "RUB");
+        FindExchangeRateByIdDto filter = new FindExchangeRateByIdDto("USD", "RUB");
         ExchangeRateDao exchangeRateDao = ExchangeRateDao.getInstance();
         CurrencyDao currencyDao = CurrencyDao.getInstance();
-        List<ExchangeRate> all = exchangeRateDao.findAll(filter);
+        List<ExchangeRate> all = exchangeRateDao.findPair(filter);
         CurrencyDao instance = CurrencyDao.getInstance();
         for (ExchangeRate exchangeRate : all) {
             System.out.println(exchangeRate);
@@ -23,7 +20,7 @@ public class DaoRunner {
             System.out.println(instance.findById(exchangeRate.getTargetCurrencyId()));
         }
         System.out.println(" ");
-        int CurrentCurrency = currencyDao.findCurrencyIdByCode("RUB");
+        int CurrentCurrency = currencyDao.findIdByCode("RUB");
         Optional<Currency> optionalCurrency = currencyDao.findById(CurrentCurrency);
         System.out.println(optionalCurrency);
 
