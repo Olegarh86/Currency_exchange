@@ -33,7 +33,7 @@
     </dependencies>
 
     <build>
-        <finalName>currencyExchange-1.0</finalName>
+        <finalName>ROOT</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

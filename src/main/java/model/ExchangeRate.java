@@ -59,8 +59,8 @@ public class ExchangeRate {
     @Override
     public String toString() {
         return "\n  id : " + id +
-               ",\n  baseCurrency : " + currency.findById(baseCurrencyId).get() +
-               ",\n  targetCurrency : " + currency.findById(targetCurrencyId).get() +
+               ",\n  baseCurrency : " + currency.findById(baseCurrencyId) +
+               ",\n  targetCurrency : " + currency.findById(targetCurrencyId) +
                ",\n  rate : " + rate;
     }
 }

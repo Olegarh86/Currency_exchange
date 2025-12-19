@@ -15,7 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Optional;
 
 @WebServlet("/api/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
@@ -30,12 +30,13 @@ public class ExchangeRateServlet extends HttpServlet {
         if (requestURI.length() != 6) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
+
         String baseCurrency = requestURI.substring(0, 3).toUpperCase();
         String targetCurrency = requestURI.substring(3).toUpperCase();
         try {
-            List<ExchangeRate> exchangeRates = instance.findPair(new FindExchangeRateByIdDto(baseCurrency, targetCurrency));
+            ExchangeRate exchangeRate = instance.findRate(new FindExchangeRateByIdDto(baseCurrency, targetCurrency));
             response.setContentType("application/json");
-            out.print(exchangeRates);
+            out.print(exchangeRate);
         } catch (DaoException e) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -79,13 +80,24 @@ public class ExchangeRateServlet extends HttpServlet {
             if (rate.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new NumberFormatException();
             }
+
         } catch (NumberFormatException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
-        instance.updateRate(baseId, targetId, rate);
-        List<ExchangeRate> exchangeRate = instance.findPair(new FindExchangeRateByIdDto(baseCurrency, targetCurrency));
-        out.print(exchangeRate);
+        try {
+            instance.updateRate(baseId, targetId, rate);
+        } catch (DaoException e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        try {
+            ExchangeRate exchangeRate = instance.findRate(new FindExchangeRateByIdDto(baseCurrency, targetCurrency));
+            out.print(exchangeRate);
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+
     }
 }

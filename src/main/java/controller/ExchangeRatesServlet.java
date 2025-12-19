@@ -43,9 +43,11 @@ public class ExchangeRatesServlet extends HttpServlet {
             return;
         }
 
-        if (currencyDao.findById(baseCurrencyId).isEmpty() || currencyDao.findById(targetCurrencyId).isEmpty()) {
+        try {
+            currencyDao.findById(baseCurrencyId);
+            currencyDao.findById(targetCurrencyId);
+        } catch (DaoException e) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return;
         }
 
         PrintWriter out = response.getWriter();
@@ -62,3 +64,4 @@ public class ExchangeRatesServlet extends HttpServlet {
         }
     }
 }
+

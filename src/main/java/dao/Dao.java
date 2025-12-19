@@ -9,7 +9,7 @@ public interface Dao<K, E> {
 
     void update(E currency);
 
-    Optional<E> findById(K id);
+    E findById(K id);
 
     List<E> findAll();
 }

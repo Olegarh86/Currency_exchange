@@ -30,7 +30,7 @@ public class CurrencyServlet extends HttpServlet {
 
         try {
             int currencyId = instance.findIdByCode(path);
-            Optional<Currency> currency = instance.findById(currencyId);
+            Currency currency = instance.findById(currencyId);
             out.print(currency);
         } catch (DaoException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);

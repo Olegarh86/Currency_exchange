@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
@@ -92,24 +93,15 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
     }
 
     @Override
-    public Optional<ExchangeRate> findById(Integer id) {
+    public ExchangeRate findById(Integer id) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
-            ExchangeRate exchangeRate = null;
-            if (resultSet.next()) {
-                exchangeRate = buildExchangeRate(resultSet);
-            }
-            return Optional.ofNullable(exchangeRate);
+            return buildExchangeRate(resultSet);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
-    }
-
-    private Currency buildCurrency(ResultSet resultSet, String currency) throws SQLException {
-        return currencyDao.findById(resultSet.getInt(currency),
-                resultSet.getStatement().getConnection()).orElse(null);
     }
 
     @Override
@@ -127,25 +119,28 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
         }
     }
 
-    public List<ExchangeRate> findPair(FindExchangeRateByIdDto filter) {
+    public ExchangeRate findRate(FindExchangeRateByIdDto filter) {
         List<Integer> parameters = new ArrayList<>();
+        ExchangeRate exchangeRate = null;
         parameters.add(currencyDao.findIdByCode(filter.base_currency_code()));
         parameters.add(currencyDao.findIdByCode(filter.target_currency_code()));
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_EXCHANGE_RATE_BY_CODES_SQL)) {
+
             for (int i = 0; i < parameters.size(); i++) {
                 preparedStatement.setInt(i + 1, parameters.get(i));
             }
             ResultSet resultSet = preparedStatement.executeQuery();
-            List<ExchangeRate> exchangeRates = new ArrayList<>();
-            while (resultSet.next()) {
-                exchangeRates.add(buildExchangeRate(resultSet));
-            }
 
-            return exchangeRates;
-        } catch (SQLException e) {
+            if (resultSet.next()) {
+                exchangeRate = buildExchangeRate(resultSet);
+            } else {
+                throw new DaoException("Такого курса не существует");
+            }
+        } catch (SQLException | NoSuchElementException e) {
             throw new DaoException(e);
         }
+        return exchangeRate;
     }
 
     private static ExchangeRate buildExchangeRate(ResultSet resultSet) throws SQLException {

@@ -68,7 +68,7 @@ public class CurrencyDao implements Dao<Integer, Currency> {
     }
 
     @Override
-    public Optional<Currency> findById(Integer id) {
+    public Currency findById(Integer id) {
         try (Connection connection = ConnectionManager.get()) {
             return findById(id, connection);
         } catch (SQLException e) {
@@ -83,10 +83,7 @@ public class CurrencyDao implements Dao<Integer, Currency> {
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                currencies.add(new Currency(resultSet.getInt("id"),
-                        resultSet.getString("code"),
-                        resultSet.getString("full_name"),
-                        resultSet.getString("sign")));
+                currencies.add(buildCurrency(resultSet.getInt("id"), resultSet));
             }
             return currencies;
         } catch (SQLException e) {
@@ -94,27 +91,26 @@ public class CurrencyDao implements Dao<Integer, Currency> {
         }
     }
 
-    public Optional<Currency> findById(Integer id, Connection connection) {
+    public Currency findById(Integer id, Connection connection) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
-            Currency currency = null;
-            if (resultSet.next()) {
-                currency = new Currency(id,
-                        resultSet.getString("code"),
-                        resultSet.getString("full_name"),
-                        resultSet.getString("sign"));
-                return Optional.ofNullable(currency);
-            }
+            return buildCurrency(id, resultSet);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
-        return Optional.empty();
+    }
+
+    private static Currency buildCurrency(Integer id, ResultSet resultSet) throws SQLException {
+        return new Currency(id,
+                resultSet.getString("code"),
+                resultSet.getString("full_name"),
+                resultSet.getString("sign"));
     }
 
     public int findIdByCode(String code) {
         try (Connection connection = ConnectionManager.get();
-        PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_CODE_SQL)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_CODE_SQL)) {
             preparedStatement.setString(1, code);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
