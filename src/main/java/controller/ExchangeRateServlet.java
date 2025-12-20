@@ -1,5 +1,6 @@
 package controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dao.CurrencyDao;
 import dao.ExchangeRateDao;
 import dto.FindExchangeRateByIdDto;
@@ -9,6 +10,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.Currency;
 import model.ExchangeRate;
 
 import java.io.BufferedReader;
@@ -20,10 +22,12 @@ import java.util.Optional;
 @WebServlet("/api/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
 
+    private final ObjectMapper mapper = new ObjectMapper();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        response.setContentType("application/json");
         ExchangeRateDao instance = ExchangeRateDao.getInstance();
         String requestURI = request.getRequestURI();
         requestURI = requestURI.substring(requestURI.lastIndexOf('/') + 1).toUpperCase();
@@ -35,8 +39,13 @@ public class ExchangeRateServlet extends HttpServlet {
         String targetCurrency = requestURI.substring(3).toUpperCase();
         try {
             ExchangeRate exchangeRate = instance.findRate(new FindExchangeRateByIdDto(baseCurrency, targetCurrency));
-            response.setContentType("application/json");
-            out.print(exchangeRate);
+            int baseCurrencyId = exchangeRate.getBaseCurrencyId();
+            int targetCurrencyId = exchangeRate.getTargetCurrencyId();
+            CurrencyDao currencyDao = CurrencyDao.getInstance();
+            Currency base = currencyDao.findById(baseCurrencyId);
+            Currency target = currencyDao.findById(targetCurrencyId);
+            ExchangeRate exchangeRate1 = new ExchangeRate(exchangeRate.getId(), base, target, exchangeRate.getRate());
+            mapper.writeValue(out, exchangeRate1);
         } catch (DaoException e) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -48,6 +57,7 @@ public class ExchangeRateServlet extends HttpServlet {
     }
 
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         BufferedReader reader = request.getReader();
         StringBuilder body = new StringBuilder();
@@ -94,7 +104,7 @@ public class ExchangeRateServlet extends HttpServlet {
         }
         try {
             ExchangeRate exchangeRate = instance.findRate(new FindExchangeRateByIdDto(baseCurrency, targetCurrency));
-            out.print(exchangeRate);
+            mapper.writeValue(out, exchangeRate);
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }

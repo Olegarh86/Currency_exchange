@@ -1,15 +1,43 @@
 package model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dao.CurrencyDao;
 
 import java.math.BigDecimal;
 
 public class ExchangeRate {
     private int id;
+    @JsonIgnore
     private int baseCurrencyId;
+    @JsonIgnore
     private int targetCurrencyId;
+    private Currency baseCurrency;
+    private Currency targetCurrency;
     private BigDecimal rate;
-    private final CurrencyDao currency = CurrencyDao.getInstance();
+
+
+    public ExchangeRate(int baseCurrencyId, int targetCurrencyId, Currency baseCurrency,
+                        Currency targetCurrency, BigDecimal rate) {
+        this.id = id;
+        this.baseCurrencyId = baseCurrencyId;
+        this.targetCurrencyId = targetCurrencyId;
+        this.baseCurrency = baseCurrency;
+        this.targetCurrency = targetCurrency;
+        this.rate = rate;
+    }
+
+    public ExchangeRate(Currency baseCurrency, Currency targetCurrency, BigDecimal rate) {
+        this.baseCurrency = baseCurrency;
+        this.targetCurrency = targetCurrency;
+        this.rate = rate;
+    }
+
+    public ExchangeRate(int id, Currency baseCurrency, Currency targetCurrency, BigDecimal rate) {
+        this.id = id;
+        this.baseCurrency = baseCurrency;
+        this.targetCurrency = targetCurrency;
+        this.rate = rate;
+    }
 
     public ExchangeRate(int id, int baseCurrency, int targetCurrency, BigDecimal rate) {
         this.id = id;
@@ -22,6 +50,22 @@ public class ExchangeRate {
         this.baseCurrencyId = baseCurrency;
         this.targetCurrencyId = targetCurrency;
         this.rate = rate;
+    }
+
+    public Currency getBaseCurrency() {
+        return baseCurrency;
+    }
+
+    public void setBaseCurrency(Currency baseCurrency) {
+        this.baseCurrency = baseCurrency;
+    }
+
+    public Currency getTargetCurrency() {
+        return targetCurrency;
+    }
+
+    public void setTargetCurrency(Currency targetCurrency) {
+        this.targetCurrency = targetCurrency;
     }
 
     public int getId() {
@@ -58,9 +102,11 @@ public class ExchangeRate {
 
     @Override
     public String toString() {
-        return "\n  id : " + id +
-               ",\n  baseCurrency : " + currency.findById(baseCurrencyId) +
-               ",\n  targetCurrency : " + currency.findById(targetCurrencyId) +
-               ",\n  rate : " + rate;
+        return "id : " + id +
+               ", baseCurrency : " + baseCurrencyId +
+               ", targetCurrency : " + targetCurrencyId +
+               ", rate : " + rate +
+               ", baseCurrencyCurrency : " + baseCurrency +
+               ", targetCurrencyCurrency : " + targetCurrency;
     }
 }

@@ -3,7 +3,6 @@ package dao;
 import dao.util.ConnectionManager;
 import dto.FindExchangeRateByIdDto;
 import exception.DaoException;
-import model.Currency;
 import model.ExchangeRate;
 
 import java.math.BigDecimal;
@@ -11,7 +10,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
     private final static ExchangeRateDao INSTANCE = new ExchangeRateDao();
@@ -122,8 +120,10 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
     public ExchangeRate findRate(FindExchangeRateByIdDto filter) {
         List<Integer> parameters = new ArrayList<>();
         ExchangeRate exchangeRate = null;
-        parameters.add(currencyDao.findIdByCode(filter.base_currency_code()));
-        parameters.add(currencyDao.findIdByCode(filter.target_currency_code()));
+        int baseCode = currencyDao.findIdByCode(filter.base_currency_code());
+        int targetCode = currencyDao.findIdByCode(filter.target_currency_code());
+        parameters.add(baseCode);
+        parameters.add(targetCode);
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_EXCHANGE_RATE_BY_CODES_SQL)) {
 
@@ -134,19 +134,21 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
 
             if (resultSet.next()) {
                 exchangeRate = buildExchangeRate(resultSet);
+                return exchangeRate;
             } else {
                 throw new DaoException("Такого курса не существует");
             }
         } catch (SQLException | NoSuchElementException e) {
             throw new DaoException(e);
         }
-        return exchangeRate;
     }
 
     private static ExchangeRate buildExchangeRate(ResultSet resultSet) throws SQLException {
-        return new ExchangeRate(resultSet.getInt("id"),
+        ExchangeRate exchangeRate = new ExchangeRate(resultSet.getInt("id"),
                 resultSet.getInt("base_currency_id"),
                 resultSet.getInt("target_currency_id"),
                 resultSet.getBigDecimal("rate"));
+        return exchangeRate;
+
     }
 }

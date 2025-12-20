@@ -1,7 +1,9 @@
 package controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dao.CurrencyDao;
 import dao.ExchangeRateDao;
+import dto.ExchangeResponseDto;
 import dto.FindExchangeRateByIdDto;
 import exception.DaoException;
 import jakarta.servlet.ServletException;
@@ -21,15 +23,16 @@ import java.util.Optional;
 @WebServlet("/api/exchange")
 public class ExchangeServlet extends HttpServlet {
 
+    private final ObjectMapper mapper = new ObjectMapper();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
         ExchangeRateDao instance = ExchangeRateDao.getInstance();
         CurrencyDao instanceCurrency = CurrencyDao.getInstance();
         BigDecimal convertedAmount;
         BigDecimal rate = null;
-        PrintWriter out = response.getWriter();
-        request.setCharacterEncoding("UTF-8");
-        response.setContentType("text/json;charset=UTF-8");
         String from = request.getParameter("from");
         String to = request.getParameter("to");
         int fromInt = instanceCurrency.findIdByCode(from);
@@ -68,12 +71,17 @@ public class ExchangeServlet extends HttpServlet {
         }
 
         convertedAmount = amount.multiply(rate).setScale(2, RoundingMode.HALF_EVEN);
-
-        out.println("baseCurrency : \n" + baseCurrency);
-        out.println("targetCurrency : \n" + targetCurrency);
-        out.println("rate : \n" + rate);
-        out.println("amount : " + amount);
-        out.println("convertedAmount : " + convertedAmount);
+//        Object answer = /*"baseCurrency : " + */baseCurrency + /*" targetCurrency : " */+ targetCurrency +
+//                        " rate : " + rate + " amount : " + amount + " convertedAmount : " + convertedAmount;
+        ExchangeRate exchangeRateResult = new ExchangeRate(baseCurrency, targetCurrency, rate);
+        ExchangeResponseDto exchangeResponseDto = new ExchangeResponseDto(
+                baseCurrency, targetCurrency, rate, amount, convertedAmount);
+//        out.println("baseCurrency : \n" + baseCurrency);
+//        out.println("targetCurrency : \n" + targetCurrency);
+//        out.println("rate : \n" + rate);
+//        out.println("amount : " + amount);
+//        out.println("convertedAmount : " + convertedAmount);
+        mapper.writeValue(out, exchangeResponseDto);
     }
 
     @Override

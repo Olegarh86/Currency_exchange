@@ -1,5 +1,6 @@
 package controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dao.CurrencyDao;
 import exception.DaoException;
 import jakarta.servlet.ServletException;
@@ -16,19 +17,20 @@ import java.util.List;
 @WebServlet("/api/currencies")
 public class CurrenciesServlet extends HttpServlet {
 
+    private final ObjectMapper mapper = new ObjectMapper();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<Currency> currencies = CurrencyDao.getInstance().findAll();
+        response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        response.setContentType("text/json");
-        for (Currency currency : currencies) {
-            out.println(currency);
-        }
+        mapper.writeValue(out, currencies);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         CurrencyDao currency = CurrencyDao.getInstance();
+        response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         String code = request.getParameter("code").toUpperCase();
         String name = request.getParameter("name");
@@ -39,9 +41,8 @@ public class CurrenciesServlet extends HttpServlet {
         }
         try {
             Currency saved = currency.save(new Currency(code, name, sign));
-            response.setContentType("text/json");
             response.setStatus(HttpServletResponse.SC_CREATED);
-            out.println(saved);
+            mapper.writeValue(out, saved);
         } catch (DaoException e) {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
         }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Optional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dao.CurrencyDao;
 import exception.DaoException;
 import jakarta.servlet.ServletException;
@@ -15,25 +16,28 @@ import model.Currency;
 
 @WebServlet("/api/currency/*")
 public class CurrencyServlet extends HttpServlet {
+
+    private final ObjectMapper mapper = new ObjectMapper();
+
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-        String path = req.getRequestURI();
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        CurrencyDao instance = CurrencyDao.getInstance();
+        String path = request.getRequestURI();
         path = path.substring(path.lastIndexOf('/') + 1).toUpperCase();
         if (path.isEmpty()) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
-        CurrencyDao instance = CurrencyDao.getInstance();
-        PrintWriter out = resp.getWriter();
-        resp.setContentType("text/json");
 
         try {
             int currencyId = instance.findIdByCode(path);
             Currency currency = instance.findById(currencyId);
-            out.print(currency);
+            mapper.writeValue(out, currency);
         } catch (DaoException e) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
