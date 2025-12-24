@@ -1,27 +1,32 @@
 package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import dao.CurrencyDao;
+import dao.util.DBConnector;
 import exception.DaoException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.sql.Connection;
 import model.Currency;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-@WebServlet("/api/currencies")
+@WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
-
     private final ObjectMapper mapper = new ObjectMapper();
+    private final DBConnector connector = new DBConnector();
+    private final Connection connection = connector.getConnection();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Currency> currencies = CurrencyDao.getInstance().findAll();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        List<Currency> currencies = CurrencyDao.getInstance().findAll(connection);
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         mapper.writeValue(out, currencies);
@@ -29,6 +34,7 @@ public class CurrenciesServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         CurrencyDao currency = CurrencyDao.getInstance();
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
@@ -40,7 +46,7 @@ public class CurrenciesServlet extends HttpServlet {
             return;
         }
         try {
-            Currency saved = currency.save(new Currency(code, name, sign));
+            Currency saved = currency.save(connection, new Currency(code, name, sign));
             response.setStatus(HttpServletResponse.SC_CREATED);
             mapper.writeValue(out, saved);
         } catch (DaoException e) {

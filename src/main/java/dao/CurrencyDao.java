@@ -1,6 +1,5 @@
 package dao;
 
-import dao.util.ConnectionManager;
 import exception.DaoException;
 import model.Currency;
 
@@ -35,9 +34,8 @@ public class CurrencyDao implements Dao<Integer, Currency> {
     }
 
     @Override
-    public Currency save(Currency currency) {
-        try (Connection connection = ConnectionManager.get()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
+    public Currency save(Connection connection, Currency currency) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, currency.getCode());
             preparedStatement.setString(2, currency.getName());
             preparedStatement.setString(3, currency.getSign());
@@ -53,9 +51,8 @@ public class CurrencyDao implements Dao<Integer, Currency> {
     }
 
     @Override
-    public void update(Currency currency) {
-        try (Connection connection = ConnectionManager.get();
-             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
+    public void update(Connection connection, Currency currency) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
             preparedStatement.setString(1, currency.getCode());
             preparedStatement.setString(2, currency.getName());
             preparedStatement.setString(3, currency.getSign());
@@ -66,20 +63,11 @@ public class CurrencyDao implements Dao<Integer, Currency> {
         }
     }
 
-    @Override
-    public Currency findById(Integer id) {
-        try (Connection connection = ConnectionManager.get()) {
-            return findById(id, connection);
-        } catch (SQLException e) {
-            throw new DaoException(e);
-        }
-    }
 
     @Override
-    public List<Currency> findAll() {
+    public List<Currency> findAll(Connection connection) {
         List<Currency> currencies = new ArrayList<>();
-        try (Connection connection = ConnectionManager.get();
-             PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 currencies.add(buildCurrency(resultSet.getInt("id"), resultSet));
@@ -90,7 +78,8 @@ public class CurrencyDao implements Dao<Integer, Currency> {
         }
     }
 
-    public Currency findById(Integer id, Connection connection) {
+    @Override
+    public Currency findById(Connection connection, Integer id) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -107,9 +96,8 @@ public class CurrencyDao implements Dao<Integer, Currency> {
                 resultSet.getString("sign"));
     }
 
-    public int findIdByCode(String code) {
-        try (Connection connection = ConnectionManager.get();
-             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_CODE_SQL)) {
+    public int findIdByCode(Connection connection, String code) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_CODE_SQL)) {
             preparedStatement.setString(1, code);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {

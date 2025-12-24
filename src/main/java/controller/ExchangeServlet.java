@@ -1,8 +1,10 @@
 package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import dao.CurrencyDao;
 import dao.ExchangeRateDao;
+import dao.util.DBConnector;
 import dto.ExchangeResponseDto;
 import dto.FindExchangeRateByIdDto;
 import exception.DaoException;
@@ -18,15 +20,17 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Optional;
+import java.sql.Connection;
 
-@WebServlet("/api/exchange")
+@WebServlet("/exchange")
 public class ExchangeServlet extends HttpServlet {
-
     private final ObjectMapper mapper = new ObjectMapper();
+    private final DBConnector connector = new DBConnector();
+    private final Connection connection = connector.getConnection();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         ExchangeRateDao instance = ExchangeRateDao.getInstance();
@@ -35,10 +39,10 @@ public class ExchangeServlet extends HttpServlet {
         BigDecimal rate = null;
         String from = request.getParameter("from");
         String to = request.getParameter("to");
-        int fromInt = instanceCurrency.findIdByCode(from);
-        Currency baseCurrency = instanceCurrency.findById(fromInt);
-        int toInt = instanceCurrency.findIdByCode(to);
-        Currency targetCurrency = instanceCurrency.findById(toInt);
+        int fromInt = instanceCurrency.findIdByCode(connection, from);
+        Currency baseCurrency = instanceCurrency.findById(connection, fromInt);
+        int toInt = instanceCurrency.findIdByCode(connection, to);
+        Currency targetCurrency = instanceCurrency.findById(connection, toInt);
         BigDecimal amount = new BigDecimal(request.getParameter("amount"));
 
         if (from == null || to == null || (amount.compareTo(BigDecimal.ZERO) <= 0)) {
@@ -49,19 +53,19 @@ public class ExchangeServlet extends HttpServlet {
         FindExchangeRateByIdDto exchangeRateDto = new FindExchangeRateByIdDto(from, to);
         ExchangeRate exchangeRate = null;
         try {
-            exchangeRate = instance.findRate(exchangeRateDto);
+            exchangeRate = instance.findRate(connection, exchangeRateDto);
             rate = exchangeRate.getRate();
         } catch (DaoException e) {
             try {
                 exchangeRateDto = new FindExchangeRateByIdDto(to, from);
-                exchangeRate = instance.findRate(exchangeRateDto);
+                exchangeRate = instance.findRate(connection, exchangeRateDto);
                 rate = BigDecimal.ONE.divide(exchangeRate.getRate(), 6, RoundingMode.HALF_UP);
             } catch (DaoException ex) {
                 try {
                     exchangeRateDto = new FindExchangeRateByIdDto("USD", from);
-                    ExchangeRate exchangeRateFrom = instance.findRate(exchangeRateDto);
+                    ExchangeRate exchangeRateFrom = instance.findRate(connection, exchangeRateDto);
                     exchangeRateDto = new FindExchangeRateByIdDto("USD", to);
-                    ExchangeRate exchangeRateTo = instance.findRate(exchangeRateDto);
+                    ExchangeRate exchangeRateTo = instance.findRate(connection, exchangeRateDto);
                     rate = exchangeRateTo.getRate().divide(exchangeRateFrom.getRate(), 6, RoundingMode.HALF_EVEN);
                 } catch (Exception exc) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -71,16 +75,8 @@ public class ExchangeServlet extends HttpServlet {
         }
 
         convertedAmount = amount.multiply(rate).setScale(2, RoundingMode.HALF_EVEN);
-//        Object answer = /*"baseCurrency : " + */baseCurrency + /*" targetCurrency : " */+ targetCurrency +
-//                        " rate : " + rate + " amount : " + amount + " convertedAmount : " + convertedAmount;
-        ExchangeRate exchangeRateResult = new ExchangeRate(baseCurrency, targetCurrency, rate);
         ExchangeResponseDto exchangeResponseDto = new ExchangeResponseDto(
                 baseCurrency, targetCurrency, rate, amount, convertedAmount);
-//        out.println("baseCurrency : \n" + baseCurrency);
-//        out.println("targetCurrency : \n" + targetCurrency);
-//        out.println("rate : \n" + rate);
-//        out.println("amount : " + amount);
-//        out.println("convertedAmount : " + convertedAmount);
         mapper.writeValue(out, exchangeResponseDto);
     }
 

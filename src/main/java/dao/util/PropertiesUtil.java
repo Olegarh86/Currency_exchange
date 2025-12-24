@@ -1,6 +1,6 @@
 package dao.util;
 
-import exception.DaoException;
+import exception.LoadPropertiesException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,18 +12,19 @@ public final class PropertiesUtil {
         loadProperties();
     }
 
+    private PropertiesUtil() {
+    }
+
     public static String getProperties(String key) {
         return PROPERTIES.getProperty(key);
     }
 
     private static void loadProperties() {
-        try (InputStream resourceAsStream = PropertiesUtil.class.getClassLoader().getResourceAsStream("application.properties")) {
+        try (InputStream resourceAsStream = PropertiesUtil.class.getClassLoader().getResourceAsStream(
+                "application.properties")) {
             PROPERTIES.load(resourceAsStream);
         } catch (IOException e) {
-            throw new DaoException(e);
+            throw new LoadPropertiesException(e);
         }
-    }
-
-    private PropertiesUtil() {
     }
 }
