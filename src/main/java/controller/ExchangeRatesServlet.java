@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dao.CurrencyDao;
 import dao.ExchangeRateDao;
-import dao.util.DBConnector;
 import exception.DaoException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,15 +16,12 @@ import model.ExchangeRate;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
     private final ObjectMapper mapper = new ObjectMapper();
-    private final DBConnector connector = new DBConnector();
-    private final Connection connection = connector.getConnection();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -33,12 +29,12 @@ public class ExchangeRatesServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         ExchangeRateDao instance = ExchangeRateDao.getInstance();
-        List<ExchangeRate> exchangeRates = instance.findAll(connection);
+        List<ExchangeRate> exchangeRates = instance.findAll();
         List<ExchangeRate> exchangeRates1 = new ArrayList<>();
         for (ExchangeRate exchangeRate : exchangeRates) {
             CurrencyDao currencyDao = CurrencyDao.getInstance();
-            Currency base = currencyDao.findById(connection, exchangeRate.getBaseCurrencyId());
-            Currency target = currencyDao.findById(connection, exchangeRate.getTargetCurrencyId());
+            Currency base = currencyDao.findById(exchangeRate.getBaseCurrencyId());
+            Currency target = currencyDao.findById(exchangeRate.getTargetCurrencyId());
             exchangeRates1.add(new ExchangeRate (exchangeRate.getId(), base, target, exchangeRate.getRate()));
         }
         mapper.writeValue(out, exchangeRates1);
@@ -56,11 +52,11 @@ public class ExchangeRatesServlet extends HttpServlet {
         BigDecimal rate = new BigDecimal(request.getParameter("rate"));
         if (rate.compareTo(BigDecimal.ZERO) > 0 && !codeBaseCurrency.isEmpty() && !codeTargetCurrency.isEmpty()) {
             try {
-                int idBaseCurrency = currencyDao.findIdByCode(connection, codeBaseCurrency);
-                int idTargetCurrency = currencyDao.findIdByCode(connection, codeTargetCurrency);
-                Currency baseCurrency = currencyDao.findById(connection, idBaseCurrency);
-                Currency targetCurrency = currencyDao.findById(connection, idTargetCurrency);
-                ExchangeRate exchangeRate = instance.save(connection, new ExchangeRate(idBaseCurrency, idTargetCurrency,
+                int idBaseCurrency = currencyDao.findIdByCode(codeBaseCurrency);
+                int idTargetCurrency = currencyDao.findIdByCode(codeTargetCurrency);
+                Currency baseCurrency = currencyDao.findById(idBaseCurrency);
+                Currency targetCurrency = currencyDao.findById(idTargetCurrency);
+                ExchangeRate exchangeRate = instance.save(new ExchangeRate(idBaseCurrency, idTargetCurrency,
                         baseCurrency, targetCurrency, rate));
 
                 response.setStatus(HttpServletResponse.SC_CREATED);

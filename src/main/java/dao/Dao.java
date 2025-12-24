@@ -6,11 +6,11 @@ import java.util.Optional;
 
 public interface Dao<K, E> {
 
-    E save(Connection connection, E currency);
+    E save(E currency);
 
-    void update(Connection connection, E currency);
+    void update(E currency);
 
-    E findById(Connection connection, K id);
+    E findById(K id);
 
-    List<E> findAll(Connection connection);
+    List<E> findAll();
 }

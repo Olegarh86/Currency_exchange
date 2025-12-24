@@ -1,5 +1,6 @@
 package dao;
 
+import dao.util.DBConnector;
 import exception.DaoException;
 import model.Currency;
 
@@ -25,6 +26,8 @@ public class CurrencyDao implements Dao<Integer, Currency> {
             """;
     private static final String FIND_BY_ID_SQL = FIND_ALL_SQL + " WHERE id = ?";
     private static final String FIND_BY_CODE_SQL = FIND_ALL_SQL + " WHERE code = ?";
+    private final DBConnector connector = new DBConnector();
+    private final Connection connection = connector.getConnection();
 
     private CurrencyDao() {
     }
@@ -34,7 +37,7 @@ public class CurrencyDao implements Dao<Integer, Currency> {
     }
 
     @Override
-    public Currency save(Connection connection, Currency currency) {
+    public Currency save(Currency currency) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, currency.getCode());
             preparedStatement.setString(2, currency.getName());
@@ -51,7 +54,7 @@ public class CurrencyDao implements Dao<Integer, Currency> {
     }
 
     @Override
-    public void update(Connection connection, Currency currency) {
+    public void update(Currency currency) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
             preparedStatement.setString(1, currency.getCode());
             preparedStatement.setString(2, currency.getName());
@@ -65,7 +68,7 @@ public class CurrencyDao implements Dao<Integer, Currency> {
 
 
     @Override
-    public List<Currency> findAll(Connection connection) {
+    public List<Currency> findAll() {
         List<Currency> currencies = new ArrayList<>();
         try (PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -79,7 +82,7 @@ public class CurrencyDao implements Dao<Integer, Currency> {
     }
 
     @Override
-    public Currency findById(Connection connection, Integer id) {
+    public Currency findById(Integer id) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -96,7 +99,7 @@ public class CurrencyDao implements Dao<Integer, Currency> {
                 resultSet.getString("sign"));
     }
 
-    public int findIdByCode(Connection connection, String code) {
+    public int findIdByCode(String code) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_CODE_SQL)) {
             preparedStatement.setString(1, code);
             ResultSet resultSet = preparedStatement.executeQuery();

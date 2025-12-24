@@ -1,5 +1,6 @@
 package dao;
 
+import dao.util.DBConnector;
 import dto.FindExchangeRateByIdDto;
 import exception.DaoException;
 import model.ExchangeRate;
@@ -36,6 +37,8 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
              Where base_currency_id = ? AND target_currency_id = ?
             """;
     private final CurrencyDao currencyDao = CurrencyDao.getInstance();
+    private final DBConnector connector = new DBConnector();
+    private final Connection connection = connector.getConnection();
 
     private ExchangeRateDao() {
     }
@@ -45,7 +48,7 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
     }
 
     @Override
-    public ExchangeRate save(Connection connection, ExchangeRate exchangeRate) {
+    public ExchangeRate save(ExchangeRate exchangeRate) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setObject(1, exchangeRate.getBaseCurrencyId());
             preparedStatement.setObject(2, exchangeRate.getTargetCurrencyId());
@@ -63,7 +66,7 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
     }
 
     @Override
-    public void update(Connection connection, ExchangeRate exchangeRate) {
+    public void update(ExchangeRate exchangeRate) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
             preparedStatement.setInt(1, exchangeRate.getBaseCurrencyId());
             preparedStatement.setInt(2, exchangeRate.getTargetCurrencyId());
@@ -75,7 +78,7 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
         }
     }
 
-    public void updateRate(Connection connection, int baseCurrencyId, int targetCurrencyId,  BigDecimal rate) {
+    public void updateRate(int baseCurrencyId, int targetCurrencyId,  BigDecimal rate) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_RATE_SQL)) {
             preparedStatement.setBigDecimal(1, rate);
             preparedStatement.setInt(2, baseCurrencyId);
@@ -87,7 +90,7 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
     }
 
     @Override
-    public ExchangeRate findById(Connection connection, Integer id) {
+    public ExchangeRate findById(Integer id) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -98,7 +101,7 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
     }
 
     @Override
-    public List<ExchangeRate> findAll(Connection connection) {
+    public List<ExchangeRate> findAll() {
         List<ExchangeRate> exchangeRates = new ArrayList<>();
         try (PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -111,11 +114,11 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
         }
     }
 
-    public ExchangeRate findRate(Connection connection, FindExchangeRateByIdDto filter) {
+    public ExchangeRate findRate(FindExchangeRateByIdDto filter) {
         List<Integer> parameters = new ArrayList<>();
         ExchangeRate exchangeRate = null;
-        int baseCode = currencyDao.findIdByCode(connection, filter.base_currency_code());
-        int targetCode = currencyDao.findIdByCode(connection, filter.target_currency_code());
+        int baseCode = currencyDao.findIdByCode(filter.base_currency_code());
+        int targetCode = currencyDao.findIdByCode(filter.target_currency_code());
         parameters.add(baseCode);
         parameters.add(targetCode);
         try (PreparedStatement preparedStatement = connection.prepareStatement(FIND_EXCHANGE_RATE_BY_CODES_SQL)) {
