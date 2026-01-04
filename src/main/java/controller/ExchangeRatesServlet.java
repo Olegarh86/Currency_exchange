@@ -19,14 +19,12 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet("/exchangeRates")
+@WebServlet(value = "/exchangeRates", name = "ExchangeRatesServlet")
 public class ExchangeRatesServlet extends HttpServlet {
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         ExchangeRateDao instance = ExchangeRateDao.getInstance();
         List<ExchangeRate> exchangeRates = instance.findAll();
@@ -42,8 +40,6 @@ public class ExchangeRatesServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         ExchangeRateDao instance = ExchangeRateDao.getInstance();
         CurrencyDao currencyDao = CurrencyDao.getInstance();

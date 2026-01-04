@@ -15,24 +15,20 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-@WebServlet("/currencies")
+@WebServlet(value = "/currencies", name= "CurrenciesServlet")
 public class CurrenciesServlet extends HttpServlet {
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         List<Currency> currencies = CurrencyDao.getInstance().findAll();
-        response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         mapper.writeValue(out, currencies);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         CurrencyDao currency = CurrencyDao.getInstance();
-        response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         String code = request.getParameter("code").toUpperCase();
         String name = request.getParameter("name");

@@ -20,14 +20,12 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-@WebServlet("/exchange")
+@WebServlet(value = "/exchange", name = "ExchangeServlet")
 public class ExchangeServlet extends HttpServlet {
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         ExchangeRateDao instance = ExchangeRateDao.getInstance();
         CurrencyDao instanceCurrency = CurrencyDao.getInstance();

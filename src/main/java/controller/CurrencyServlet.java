@@ -15,14 +15,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.Currency;
 
 
-@WebServlet("/currency/*")
+@WebServlet(value = "/currency/*", name = "CurrencyServlet")
 public class CurrencyServlet extends HttpServlet {
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         CurrencyDao instance = CurrencyDao.getInstance();
         String path = request.getRequestURI();
@@ -31,7 +29,6 @@ public class CurrencyServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-
 
         try {
             int currencyId = instance.findIdByCode(path);

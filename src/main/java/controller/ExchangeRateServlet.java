@@ -19,14 +19,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 
-@WebServlet("/exchangeRate/*")
+@WebServlet(value = "/exchangeRate/*", name = "ExchangeRateServlet")
 public class ExchangeRateServlet extends HttpServlet {
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         ExchangeRateDao instance = ExchangeRateDao.getInstance();
         String requestURI = request.getRequestURI();
@@ -58,8 +56,6 @@ public class ExchangeRateServlet extends HttpServlet {
     }
 
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         BufferedReader reader = request.getReader();
         StringBuilder body = new StringBuilder();
