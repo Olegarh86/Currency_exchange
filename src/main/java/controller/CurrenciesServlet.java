@@ -30,15 +30,15 @@ public class CurrenciesServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         CurrencyDao currency = CurrencyDao.getInstance();
         PrintWriter out = response.getWriter();
-        String code = request.getParameter("code").toUpperCase();
         String name = request.getParameter("name");
+        String code = request.getParameter("code").toUpperCase();
         String sign = request.getParameter("sign");
         if (code.isEmpty() || name.isEmpty() || sign.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
         try {
-            Currency saved = currency.save(new Currency(code, name, sign));
+            Currency saved = currency.save(new Currency(name, code, sign));
             response.setStatus(HttpServletResponse.SC_CREATED);
             mapper.writeValue(out, saved);
         } catch (DaoException e) {

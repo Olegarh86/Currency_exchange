@@ -94,8 +94,8 @@ public class CurrencyDao implements Dao<Integer, Currency> {
 
     private static Currency buildCurrency(Integer id, ResultSet resultSet) throws SQLException {
         return new Currency(id,
-                resultSet.getString("code"),
                 resultSet.getString("full_name"),
+                resultSet.getString("code"),
                 resultSet.getString("sign"));
     }
 

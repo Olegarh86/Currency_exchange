@@ -2,20 +2,20 @@ package model;
 
 public class Currency {
     private int id;
-    private String code;
     private String name;
+    private String code;
     private String sign;
 
-    public Currency(int id, String code, String name, String sign) {
+    public Currency(int id, String name, String code, String sign) {
         this.id = id;
-        this.code = code;
         this.name = name;
+        this.code = code;
         this.sign = sign;
     }
 
-    public Currency(String code, String name, String sign) {
-        this.code = code;
+    public Currency(String name, String code, String sign) {
         this.name = name;
+        this.code = code;
         this.sign = sign;
     }
 
