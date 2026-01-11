@@ -4,109 +4,82 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dao.CurrencyDao;
 import dao.ExchangeRateDao;
-import dto.FindExchangeRateByIdDto;
+import dto.Codes;
+import dto.ExchangeRateResponseDto;
+import dto.CurrenciesResponseDto;
 import exception.DaoException;
+import exception.NotFoundException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.Currency;
-import model.ExchangeRate;
+import service.UpdateRate;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 
+import static dao.util.Validator.*;
+
 @WebServlet(value = "/exchangeRate/*", name = "ExchangeRateServlet")
 public class ExchangeRateServlet extends HttpServlet {
+    private final ExchangeRateDao exchangeRateInstance = ExchangeRateDao.getInstance();
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        PrintWriter out = response.getWriter();
-        ExchangeRateDao instance = ExchangeRateDao.getInstance();
-        String requestURI = request.getRequestURI();
-        requestURI = requestURI.substring(requestURI.lastIndexOf('/') + 1).toUpperCase();
-        if (requestURI.length() != 6) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-        }
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Codes codes = getCodes(request);
+        validateCode(codes.baseCode());
+        validateCode(codes.targetCode());
 
-        String baseCurrency = requestURI.substring(0, 3).toUpperCase();
-        String targetCurrency = requestURI.substring(3).toUpperCase();
+        ExchangeRateResponseDto exchangeRateDto;
         try {
-            ExchangeRate exchangeRate = instance.findRate(new FindExchangeRateByIdDto(baseCurrency,
-                    targetCurrency));
-            int baseCurrencyId = exchangeRate.getBaseCurrencyId();
-            int targetCurrencyId = exchangeRate.getTargetCurrencyId();
-            CurrencyDao currencyDao = CurrencyDao.getInstance();
-            Currency base = currencyDao.findById(baseCurrencyId);
-            Currency target = currencyDao.findById(targetCurrencyId);
-            ExchangeRate exchangeRate1 = new ExchangeRate(exchangeRate.getId(), base, target, exchangeRate.getRate());
-            mapper.writeValue(out, exchangeRate1);
+            exchangeRateDto = exchangeRateInstance.findRateByCodes(codes.baseCode(), codes.targetCode());
         } catch (DaoException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            throw new NotFoundException(e.getMessage());
         }
+        PrintWriter out = response.getWriter();
+        response.setStatus(HttpServletResponse.SC_OK);
+        mapper.writeValue(out, exchangeRateDto);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String rate = getStringRate(request);
+        Codes codes = getCodes(request);
+        validateInputParameters(codes.baseCode(), codes.targetCode(), rate);
+        BigDecimal newRate = new BigDecimal(rate);
 
+        UpdateRate updateRate = new UpdateRate(exchangeRateInstance, codes, newRate);
+        updateRate.update();
+        ExchangeRateResponseDto exchangeRateDto;
+        try {
+            exchangeRateDto = exchangeRateInstance.findRateByCodes(codes.baseCode(), codes.targetCode());
+        } catch (DaoException e) {
+            throw new NotFoundException(e.getMessage());
+        }
+        response.setStatus(HttpServletResponse.SC_OK);
+        PrintWriter out = response.getWriter();
+        mapper.writeValue(out, exchangeRateDto);
     }
 
-    protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        PrintWriter out = response.getWriter();
+    private static String getStringRate(HttpServletRequest request) throws IOException {
         BufferedReader reader = request.getReader();
         StringBuilder body = new StringBuilder();
         String line;
         while ((line = reader.readLine()) != null) {
             body.append(line);
         }
-        String value = body.substring(5, body.length());
+        return body.substring(5, body.length());
+    }
 
-        ExchangeRateDao instance = ExchangeRateDao.getInstance();
-        CurrencyDao currencyDao = CurrencyDao.getInstance();
-        String requestURI = request.getRequestURI();
-        int baseId;
-        int targetId;
-        requestURI = requestURI.substring(requestURI.lastIndexOf('/') + 1).toUpperCase();
-        String baseCurrency = requestURI.substring(0, 3).toUpperCase();
-        String targetCurrency = requestURI.substring(3).toUpperCase();
-        try {
-            baseId = currencyDao.findIdByCode(baseCurrency);
-            targetId = currencyDao.findIdByCode(targetCurrency);
-        } catch (DaoException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-
-        BigDecimal rate;
-        try {
-            rate = new BigDecimal(value);
-
-            if (rate.compareTo(BigDecimal.ZERO) <= 0) {
-                throw new NumberFormatException();
-            }
-
-        } catch (NumberFormatException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-
-        try {
-            instance.updateRate(baseId, targetId, rate);
-        } catch (DaoException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-        try {
-            ExchangeRate exchangeRate = instance.findRate(new FindExchangeRateByIdDto(baseCurrency,
-                    targetCurrency));
-            mapper.writeValue(out, exchangeRate);
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        }
-
+    private static Codes getCodes(HttpServletRequest request) {
+        String codes = request.getRequestURI();
+        codes = codes.substring(codes.lastIndexOf('/') + 1).toUpperCase();
+        String baseCode = codes.substring(0, 3).toUpperCase();
+        String targetCode = codes.substring(3).toUpperCase();
+        return new Codes(baseCode, targetCode);
     }
 }

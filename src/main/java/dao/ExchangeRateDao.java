@@ -1,9 +1,9 @@
 package dao;
 
 import dao.util.DBConnector;
-import dto.FindExchangeRateByIdDto;
+import dto.*;
 import exception.DaoException;
-import model.ExchangeRate;
+import exception.NotFoundException;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
+public class ExchangeRateDao {
     private final static ExchangeRateDao INSTANCE = new ExchangeRateDao();
     private static final String INSERT_SQL = """
             INSERT INTO exchange_rate (base_currency_id, target_currency_id, rate) 
@@ -47,104 +47,78 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
         return INSTANCE;
     }
 
-    @Override
-    public ExchangeRate save(ExchangeRate exchangeRate) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setObject(1, exchangeRate.getBaseCurrencyId());
-            preparedStatement.setObject(2, exchangeRate.getTargetCurrencyId());
-            preparedStatement.setBigDecimal(3, exchangeRate.getRate());
+    public void save(ExchangeRateRequestDto exchangeRateRequestDto) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
+            preparedStatement.setObject(1, exchangeRateRequestDto.baseCurrency().id());
+            preparedStatement.setObject(2, exchangeRateRequestDto.targetCurrency().id());
+            preparedStatement.setBigDecimal(3, exchangeRateRequestDto.rate());
             preparedStatement.executeUpdate();
-            ResultSet resultSet = preparedStatement.getGeneratedKeys();
-            if (resultSet.next()) {
-                exchangeRate.setId(resultSet.getInt(1));
-                return exchangeRate;
-            }
-            throw new DaoException("Обменный курс не сохранен");
         } catch (SQLException e) {
-            throw new DaoException(e);
+            throw new DaoException("Exchange rate not saved: " + e.getMessage());
         }
     }
 
-    @Override
-    public void update(ExchangeRate exchangeRate) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
-            preparedStatement.setInt(1, exchangeRate.getBaseCurrencyId());
-            preparedStatement.setInt(2, exchangeRate.getTargetCurrencyId());
-            preparedStatement.setBigDecimal(3, exchangeRate.getRate());
-            preparedStatement.setInt(4, exchangeRate.getId());
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new DaoException(e);
-        }
-    }
-
-    public void updateRate(int baseCurrencyId, int targetCurrencyId,  BigDecimal rate) {
+    public void updateRate(int baseCurrencyId, int targetCurrencyId, BigDecimal rate) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_RATE_SQL)) {
             preparedStatement.setBigDecimal(1, rate);
             preparedStatement.setInt(2, baseCurrencyId);
             preparedStatement.setInt(3, targetCurrencyId);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new DaoException(e);
+            throw new DaoException(e.getMessage());
         }
     }
 
-    @Override
-    public ExchangeRate findById(Integer id) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
-            preparedStatement.setInt(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            return buildExchangeRate(resultSet);
-        } catch (SQLException e) {
-            throw new DaoException(e);
-        }
-    }
-
-    @Override
-    public List<ExchangeRate> findAll() {
-        List<ExchangeRate> exchangeRates = new ArrayList<>();
+    public List<ExchangeRateResponseDto> findAll() {
+        List<ExchangeRateResponseDto> allRatesDto = new ArrayList<>();
         try (PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                exchangeRates.add(buildExchangeRate(resultSet));
+                ExchangeRateDaoDto exchangeRateDaoDto = buildExchangeRateResponseDto(resultSet);
+                CurrenciesResponseDto baseDto = currencyDao.findById(exchangeRateDaoDto.baseCurrencyId());
+                CurrenciesResponseDto targetDto = currencyDao.findById(exchangeRateDaoDto.targetCurrencyId());
+                allRatesDto.add(new ExchangeRateResponseDto(exchangeRateDaoDto.id(), baseDto, targetDto,
+                        exchangeRateDaoDto.rate()));
             }
-            return exchangeRates;
+            return allRatesDto;
         } catch (SQLException e) {
-            throw new DaoException(e);
+            throw new DaoException(e.getMessage());
         }
     }
 
-    public ExchangeRate findRate(FindExchangeRateByIdDto filter) {
-        List<Integer> parameters = new ArrayList<>();
-        ExchangeRate exchangeRate = null;
-        int baseCode = currencyDao.findIdByCode(filter.base_currency_code());
-        int targetCode = currencyDao.findIdByCode(filter.target_currency_code());
-        parameters.add(baseCode);
-        parameters.add(targetCode);
+    public ExchangeRateResponseDto findRateByCodes(String baseCode, String targetCode) {
+        int baseId = currencyDao.findIdByCode(baseCode);
+        int targetId = currencyDao.findIdByCode(targetCode);
         try (PreparedStatement preparedStatement = connection.prepareStatement(FIND_EXCHANGE_RATE_BY_CODES_SQL)) {
-
-            for (int i = 0; i < parameters.size(); i++) {
-                preparedStatement.setInt(i + 1, parameters.get(i));
-            }
+            preparedStatement.setInt(1, baseId);
+            preparedStatement.setInt(2, targetId);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                exchangeRate = buildExchangeRate(resultSet);
-                return exchangeRate;
-            } else {
-                throw new DaoException("Такого курса не существует");
+                ExchangeRateDaoDto exchangeRateDaoDto = buildExchangeRateResponseDto(resultSet);
+                CurrenciesResponseDto baseDto = currencyDao.findById(exchangeRateDaoDto.baseCurrencyId());
+                CurrenciesResponseDto targetDto = currencyDao.findById(exchangeRateDaoDto.targetCurrencyId());
+                return new ExchangeRateResponseDto(exchangeRateDaoDto.id(), baseDto, targetDto, exchangeRateDaoDto.rate());
             }
+            throw new NotFoundException("There is no such course");
         } catch (SQLException | NoSuchElementException e) {
-            throw new DaoException(e);
+            throw new DaoException(e.getMessage());
         }
     }
 
-    private static ExchangeRate buildExchangeRate(ResultSet resultSet) throws SQLException {
-        ExchangeRate exchangeRate = new ExchangeRate(resultSet.getInt("id"),
+    private static ExchangeRateDaoDto buildExchangeRateResponseDto(ResultSet resultSet) throws SQLException {
+        return new ExchangeRateDaoDto(resultSet.getInt("id"),
                 resultSet.getInt("base_currency_id"),
                 resultSet.getInt("target_currency_id"),
                 resultSet.getBigDecimal("rate"));
-        return exchangeRate;
+    }
 
+    public boolean rateIsExist(String baseCode, String targetCode) {
+        try {
+            findRateByCodes(baseCode, targetCode);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 }

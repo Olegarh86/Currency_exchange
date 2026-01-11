@@ -1,7 +1,7 @@
 package exception;
 
-public class AlreadyExistException extends CurrencyExchangeException {
+public class AlreadyExistException extends RuntimeException {
     public AlreadyExistException(String message) {
-        super("The requested resource already exists ");
+        super(message);
     }
 }

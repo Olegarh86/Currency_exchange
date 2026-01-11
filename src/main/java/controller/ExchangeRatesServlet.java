@@ -4,107 +4,72 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dao.CurrencyDao;
 import dao.ExchangeRateDao;
+import dto.ExchangeRateResponseDto;
+import dto.CurrenciesResponseDto;
+import dto.ExchangeRateRequestDto;
+import exception.AlreadyExistException;
 import exception.DaoException;
-import jakarta.servlet.ServletException;
+import exception.NotFoundException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.Currency;
-import model.ExchangeRate;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
+
+import static dao.util.Validator.validateExchangeRates;
 
 @WebServlet(value = "/exchangeRates", name = "ExchangeRatesServlet")
 public class ExchangeRatesServlet extends HttpServlet {
+    private static final String BASE_CODE_PARAMETER = "baseCurrencyCode";
+    private static final String TARGET_CODE_PARAMETER = "targetCurrencyCode";
+    private static final String RATE_PARAMETER = "rate";
+    private final ExchangeRateDao exchangeRateInstance = ExchangeRateDao.getInstance();
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        PrintWriter out = response.getWriter();
-        ExchangeRateDao instance = ExchangeRateDao.getInstance();
-        List<ExchangeRate> exchangeRates = instance.findAll();
-        List<ExchangeRate> exchangeRates1 = new ArrayList<>();
-        for (ExchangeRate exchangeRate : exchangeRates) {
-            CurrencyDao currencyDao = CurrencyDao.getInstance();
-            Currency base = currencyDao.findById(exchangeRate.getBaseCurrencyId());
-            Currency target = currencyDao.findById(exchangeRate.getTargetCurrencyId());
-            exchangeRates1.add(new ExchangeRate (exchangeRate.getId(), base, target, exchangeRate.getRate()));
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        List<ExchangeRateResponseDto> exchangeRateResponseDto;
+        try {
+            exchangeRateResponseDto = exchangeRateInstance.findAll();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        mapper.writeValue(out, exchangeRates1);
+        PrintWriter out = response.getWriter();
+        response.setStatus(HttpServletResponse.SC_OK);
+        mapper.writeValue(out, exchangeRateResponseDto);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        PrintWriter out = response.getWriter();
-        ExchangeRateDao instance = ExchangeRateDao.getInstance();
-        CurrencyDao currencyDao = CurrencyDao.getInstance();
-        String codeBaseCurrency = request.getParameter("baseCurrencyCode").toUpperCase();
-        String codeTargetCurrency = request.getParameter("targetCurrencyCode").toUpperCase();
-        BigDecimal rate = new BigDecimal(request.getParameter("rate"));
-        if (rate.compareTo(BigDecimal.ZERO) > 0 && !codeBaseCurrency.isEmpty() && !codeTargetCurrency.isEmpty()) {
-            try {
-                int idBaseCurrency = currencyDao.findIdByCode(codeBaseCurrency);
-                int idTargetCurrency = currencyDao.findIdByCode(codeTargetCurrency);
-                Currency baseCurrency = currencyDao.findById(idBaseCurrency);
-                Currency targetCurrency = currencyDao.findById(idTargetCurrency);
-                ExchangeRate exchangeRate = instance.save(new ExchangeRate(idBaseCurrency, idTargetCurrency,
-                        baseCurrency, targetCurrency, rate));
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String baseCode = request.getParameter(BASE_CODE_PARAMETER).toUpperCase();
+        String targetCode = request.getParameter(TARGET_CODE_PARAMETER).toUpperCase();
+        BigDecimal rate = new BigDecimal(request.getParameter(RATE_PARAMETER));
 
-                response.setStatus(HttpServletResponse.SC_CREATED);
-                mapper.writeValue(out, exchangeRate);
-            } catch (DaoException e) {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                mapper.writeValue(out, "Валютная пара с таким кодом уже существует");
-            }
-        } else {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            mapper.writeValue(out, "Отсутствует нужное поле формы");
+        CurrenciesResponseDto baseCurrency;
+        CurrenciesResponseDto targetCurrency;
+        CurrencyDao instanceCurrency = CurrencyDao.getInstance();
+        try {
+            baseCurrency = instanceCurrency.findCurrencyByCode(baseCode);
+            targetCurrency = instanceCurrency.findCurrencyByCode(targetCode);
+        } catch (DaoException e) {
+            throw new NotFoundException(e.getMessage());
         }
-//  its for testing with tomcat
-//        response.setContentType("application/json;charset=UTF-8");
-//        PrintWriter out = response.getWriter();
-//        ExchangeRateDao instance = ExchangeRateDao.getInstance();
-//        CurrencyDao currencyDao = CurrencyDao.getInstance();
-//        Currency baseCurrency = null;
-//        Currency targetCurrency = null;
-//        int baseCurrencyId;
-//        int targetCurrencyId;
-//        BigDecimal rate;
-//        try {
-//            baseCurrencyId = Integer.parseInt(request.getParameter("baseCurrencyCode"));
-//            targetCurrencyId = Integer.parseInt(request.getParameter("targetCurrencyCode"));
-//            rate = new BigDecimal(request.getParameter("rate"));
-//        } catch (NumberFormatException e) {
-//            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//            return;
-//        }
-//
-//        try {
-//            baseCurrency = currencyDao.findById(baseCurrencyId);
-//            targetCurrency = currencyDao.findById(targetCurrencyId);
-//        } catch (DaoException e) {
-//            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-//        }
-//
-//        if (rate.compareTo(BigDecimal.ZERO) > 0) {
-//
-//            try {
-//                ExchangeRate exchangeRate = instance.save(new ExchangeRate(baseCurrencyId, targetCurrencyId, rate));
-//                exchangeRate.setBaseCurrency(baseCurrency);
-//                exchangeRate.setTargetCurrency(targetCurrency);
-//                response.setStatus(HttpServletResponse.SC_CREATED);
-//                mapper.writeValue(out, exchangeRate);
-//            } catch (DaoException e) {
-//                response.setStatus(HttpServletResponse.SC_CONFLICT);
-//                mapper.writeValue(out, "Валютная пара с таким кодом уже существует");
-//            }
-//        }
-    }
+        validateExchangeRates(exchangeRateInstance, baseCode, targetCode, rate);
+        ExchangeRateResponseDto responseDto;
 
+        try {
+            exchangeRateInstance.save(new ExchangeRateRequestDto(baseCurrency, targetCurrency, rate));
+            responseDto = exchangeRateInstance.findRateByCodes(baseCode, targetCode);
+        } catch (DaoException e) {
+            throw new AlreadyExistException(e.getMessage());
+        }
+        PrintWriter out = response.getWriter();
+        response.setStatus(HttpServletResponse.SC_CREATED);
+        mapper.writeValue(out, responseDto);
+    }
 }
 

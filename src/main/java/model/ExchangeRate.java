@@ -2,6 +2,7 @@ package model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import dao.CurrencyDao;
+import dto.CurrenciesResponseDto;
 
 import java.math.BigDecimal;
 
@@ -14,43 +15,6 @@ public class ExchangeRate {
     private Currency baseCurrency;
     private Currency targetCurrency;
     private BigDecimal rate;
-
-
-    public ExchangeRate(int baseCurrencyId, int targetCurrencyId, Currency baseCurrency,
-                        Currency targetCurrency, BigDecimal rate) {
-        this.id = id;
-        this.baseCurrencyId = baseCurrencyId;
-        this.targetCurrencyId = targetCurrencyId;
-        this.baseCurrency = baseCurrency;
-        this.targetCurrency = targetCurrency;
-        this.rate = rate;
-    }
-
-    public ExchangeRate(Currency baseCurrency, Currency targetCurrency, BigDecimal rate) {
-        this.baseCurrency = baseCurrency;
-        this.targetCurrency = targetCurrency;
-        this.rate = rate;
-    }
-
-    public ExchangeRate(int id, Currency baseCurrency, Currency targetCurrency, BigDecimal rate) {
-        this.id = id;
-        this.baseCurrency = baseCurrency;
-        this.targetCurrency = targetCurrency;
-        this.rate = rate;
-    }
-
-    public ExchangeRate(int id, int baseCurrency, int targetCurrency, BigDecimal rate) {
-        this.id = id;
-        this.baseCurrencyId = baseCurrency;
-        this.targetCurrencyId = targetCurrency;
-        this.rate = rate;
-    }
-
-    public ExchangeRate(int baseCurrency, int targetCurrency, BigDecimal rate) {
-        this.baseCurrencyId = baseCurrency;
-        this.targetCurrencyId = targetCurrency;
-        this.rate = rate;
-    }
 
     public Currency getBaseCurrency() {
         return baseCurrency;
