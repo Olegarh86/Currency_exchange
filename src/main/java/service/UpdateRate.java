@@ -10,29 +10,30 @@ import exception.NotFoundException;
 import java.math.BigDecimal;
 
 public class UpdateRate {
-    private final ExchangeRateDao exchangeRateDao;
+    private final CurrencyDao instanceCurrency;
+    private final ExchangeRateDao instanceExchangeRate;
     private final Codes codes;
     private final BigDecimal amount;
 
-    public UpdateRate(ExchangeRateDao exchangeRateDao, Codes codes, BigDecimal amount) {
-        this.exchangeRateDao = exchangeRateDao;
+    public UpdateRate(CurrencyDao instanceCurrency, ExchangeRateDao exchangeRateDao, Codes codes, BigDecimal amount) {
+        this.instanceCurrency = instanceCurrency;
+        this.instanceExchangeRate = exchangeRateDao;
         this.codes = codes;
         this.amount = amount;
     }
 
     public void update() {
-        CurrencyDao currencyDao = CurrencyDao.getInstance();
         CurrenciesResponseDto baseDto;
         CurrenciesResponseDto targetDto;
         try {
-            baseDto = currencyDao.findCurrencyByCode(codes.baseCode());
-            targetDto = currencyDao.findCurrencyByCode(codes.targetCode());
+            baseDto = instanceCurrency.findCurrencyByCode(codes.baseCode());
+            targetDto = instanceCurrency.findCurrencyByCode(codes.targetCode());
         } catch (DaoException e) {
             throw new NotFoundException(e.getMessage());
         }
 
         try {
-            exchangeRateDao.updateRate(baseDto.id(), targetDto.id(), amount);
+            instanceExchangeRate.updateRate(baseDto.id(), targetDto.id(), amount);
         } catch (DaoException e) {
             throw new NotFoundException(e.getMessage());
         }

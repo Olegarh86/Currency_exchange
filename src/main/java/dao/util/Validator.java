@@ -22,16 +22,16 @@ public final class Validator {
         }
     }
 
-    public static void validateRate(BigDecimal rate) {
+    public static void validateRateOrAmount(BigDecimal rate) {
         if (rate.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BadRequestException(badRequestMessage);
         }
     }
 
-    public static void validateInputParameters(String baseCode, String targetCode, BigDecimal rate) {
+    public static void validateInputParameters(String baseCode, String targetCode, BigDecimal value) {
         validateCode(baseCode);
         validateCode(targetCode);
-        validateRate(rate);
+        validateRateOrAmount(value);
     }
 
     public static void validateInputParameters(String baseCode, String targetCode, String rate) {
@@ -43,7 +43,7 @@ public final class Validator {
         } catch (NumberFormatException | NullPointerException e) {
             throw new BadRequestException(badRequestMessage + e.getMessage());
         }
-        validateRate(newRate);
+        validateRateOrAmount(newRate);
     }
 
     public static void validateExchangeRates(ExchangeRateDao instanceExchangeRate, String baseCode,

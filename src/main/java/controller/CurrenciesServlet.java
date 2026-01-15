@@ -7,6 +7,9 @@ import dto.CurrenciesRequestDto;
 import dto.CurrenciesResponseDto;
 import exception.AlreadyExistException;
 import exception.DaoException;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,8 +26,14 @@ public class CurrenciesServlet extends HttpServlet {
     private static final String NAME_PARAMETER = "name";
     private static final String CODE_PARAMETER = "code";
     private static final String SIGN_PARAMETER = "sign";
-    private final CurrencyDao instanceCurrency = CurrencyDao.getInstance();
+    private CurrencyDao instanceCurrency;
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+
+    @Override
+    public void init() {
+        ServletContext servletContext = getServletContext();
+        this.instanceCurrency = (CurrencyDao) servletContext.getAttribute("instanceCurrency");
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {

@@ -10,6 +10,8 @@ import dto.ExchangeRateRequestDto;
 import exception.AlreadyExistException;
 import exception.DaoException;
 import exception.NotFoundException;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,14 +29,22 @@ public class ExchangeRatesServlet extends HttpServlet {
     private static final String BASE_CODE_PARAMETER = "baseCurrencyCode";
     private static final String TARGET_CODE_PARAMETER = "targetCurrencyCode";
     private static final String RATE_PARAMETER = "rate";
-    private final ExchangeRateDao exchangeRateInstance = ExchangeRateDao.getInstance();
+    private CurrencyDao instanceCurrency;
+    private ExchangeRateDao instanceExchangeRate;
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+
+    @Override
+    public void init() {
+        ServletContext servletContext = getServletContext();
+        this.instanceCurrency = (CurrencyDao) servletContext.getAttribute("instanceCurrency");
+        this.instanceExchangeRate = (ExchangeRateDao) servletContext.getAttribute("instanceExchangeRate");
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         List<ExchangeRateResponseDto> exchangeRateResponseDto;
         try {
-            exchangeRateResponseDto = exchangeRateInstance.findAll();
+            exchangeRateResponseDto = instanceExchangeRate.findAll();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -51,19 +61,18 @@ public class ExchangeRatesServlet extends HttpServlet {
 
         CurrenciesResponseDto baseCurrency;
         CurrenciesResponseDto targetCurrency;
-        CurrencyDao instanceCurrency = CurrencyDao.getInstance();
         try {
             baseCurrency = instanceCurrency.findCurrencyByCode(baseCode);
             targetCurrency = instanceCurrency.findCurrencyByCode(targetCode);
         } catch (DaoException e) {
             throw new NotFoundException(e.getMessage());
         }
-        validateExchangeRates(exchangeRateInstance, baseCode, targetCode, rate);
+        validateExchangeRates(instanceExchangeRate, baseCode, targetCode, rate);
         ExchangeRateResponseDto responseDto;
 
         try {
-            exchangeRateInstance.save(new ExchangeRateRequestDto(baseCurrency, targetCurrency, rate));
-            responseDto = exchangeRateInstance.findRateByCodes(baseCode, targetCode);
+            instanceExchangeRate.save(new ExchangeRateRequestDto(baseCurrency, targetCurrency, rate));
+            responseDto = instanceExchangeRate.findRateByCodes(baseCode, targetCode);
         } catch (DaoException e) {
             throw new AlreadyExistException(e.getMessage());
         }

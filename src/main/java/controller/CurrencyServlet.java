@@ -9,6 +9,7 @@ import dao.CurrencyDao;
 import dto.CurrenciesResponseDto;
 import exception.DaoException;
 import exception.NotFoundException;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -19,8 +20,14 @@ import static dao.util.Validator.validateCode;
 
 @WebServlet(value = "/currency/*", name = "CurrencyServlet")
 public class CurrencyServlet extends HttpServlet {
-    private final CurrencyDao instanceCurrency = CurrencyDao.getInstance();
+    private CurrencyDao instanceCurrency;
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+
+    @Override
+    public void init() {
+        ServletContext servletContext = getServletContext();
+        this.instanceCurrency = (CurrencyDao) servletContext.getAttribute("instanceCurrency");
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {

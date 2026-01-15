@@ -2,7 +2,11 @@ package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import dao.CurrencyDao;
+import dao.ExchangeRateDao;
 import dto.ExchangeResponseDto;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +24,16 @@ public class ExchangeServlet extends HttpServlet {
     private static final String BASE_CODE_PARAMETER = "from";
     private static final String TARGET_CODE_PARAMETER = "to";
     private static final String AMOUNT_PARAMETER = "amount";
+    private CurrencyDao instanceCurrency;
+    private ExchangeRateDao instanceExchangeRate;
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+
+    @Override
+    public void init() throws ServletException {
+        ServletContext servletContext = getServletContext();
+        this.instanceCurrency = (CurrencyDao) servletContext.getAttribute("instanceCurrency");
+        this.instanceExchangeRate = (ExchangeRateDao) servletContext.getAttribute("instanceExchangeRate");
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -29,7 +42,7 @@ public class ExchangeServlet extends HttpServlet {
         BigDecimal amount = new BigDecimal(request.getParameter(AMOUNT_PARAMETER));
         validateInputParameters(baseCode, targetCode, amount);
 
-        Exchange exchange = new Exchange();
+        Exchange exchange = new Exchange(instanceCurrency, instanceExchangeRate);
         ExchangeResponseDto result = exchange.convert(baseCode, targetCode, amount);
         PrintWriter out = response.getWriter();
         mapper.writeValue(out, result);

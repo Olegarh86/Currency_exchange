@@ -6,10 +6,9 @@ import dao.CurrencyDao;
 import dao.ExchangeRateDao;
 import dto.Codes;
 import dto.ExchangeRateResponseDto;
-import dto.CurrenciesResponseDto;
 import exception.DaoException;
 import exception.NotFoundException;
-import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,8 +24,16 @@ import static dao.util.Validator.*;
 
 @WebServlet(value = "/exchangeRate/*", name = "ExchangeRateServlet")
 public class ExchangeRateServlet extends HttpServlet {
-    private final ExchangeRateDao exchangeRateInstance = ExchangeRateDao.getInstance();
+    private ExchangeRateDao instanceExchangeRate;
+    private CurrencyDao instanceCurrency;
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+
+    @Override
+    public void init() {
+        ServletContext servletContext = getServletContext();
+        this.instanceCurrency = (CurrencyDao) servletContext.getAttribute("instanceCurrency");
+        this.instanceExchangeRate = (ExchangeRateDao) servletContext.getAttribute("instanceExchangeRate");
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -36,7 +43,7 @@ public class ExchangeRateServlet extends HttpServlet {
 
         ExchangeRateResponseDto exchangeRateDto;
         try {
-            exchangeRateDto = exchangeRateInstance.findRateByCodes(codes.baseCode(), codes.targetCode());
+            exchangeRateDto = instanceExchangeRate.findRateByCodes(codes.baseCode(), codes.targetCode());
         } catch (DaoException e) {
             throw new NotFoundException(e.getMessage());
         }
@@ -52,11 +59,11 @@ public class ExchangeRateServlet extends HttpServlet {
         validateInputParameters(codes.baseCode(), codes.targetCode(), rate);
         BigDecimal newRate = new BigDecimal(rate);
 
-        UpdateRate updateRate = new UpdateRate(exchangeRateInstance, codes, newRate);
+        UpdateRate updateRate = new UpdateRate(instanceCurrency, instanceExchangeRate, codes, newRate);
         updateRate.update();
         ExchangeRateResponseDto exchangeRateDto;
         try {
-            exchangeRateDto = exchangeRateInstance.findRateByCodes(codes.baseCode(), codes.targetCode());
+            exchangeRateDto = instanceExchangeRate.findRateByCodes(codes.baseCode(), codes.targetCode());
         } catch (DaoException e) {
             throw new NotFoundException(e.getMessage());
         }

@@ -1,14 +1,9 @@
 package controller.filter;
 
-import exception.BadRequestException;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 
 import java.io.IOException;
-import java.util.Currency;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @WebFilter(servletNames = {"CurrenciesServlet"})
 public class CurrencyCodeFilter implements Filter {

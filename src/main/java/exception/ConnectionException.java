@@ -1,9 +1,7 @@
 package exception;
 
-import java.sql.SQLException;
-
 public class ConnectionException extends RuntimeException {
-    public ConnectionException(SQLException e) {
+    public ConnectionException(String e) {
         super("Connection Exception " + e);
     }
 }
