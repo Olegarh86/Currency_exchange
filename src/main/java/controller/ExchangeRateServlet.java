@@ -24,6 +24,8 @@ import static dao.util.Validator.*;
 
 @WebServlet(value = "/exchangeRate/*", name = "ExchangeRateServlet")
 public class ExchangeRateServlet extends HttpServlet {
+    private static final String INSTANCE_CURRENCY = "instanceCurrency";
+    private static final String INSTANCE_EXCHANGE_RATE = "instanceExchangeRate";
     private ExchangeRateDao instanceExchangeRate;
     private CurrencyDao instanceCurrency;
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
@@ -31,8 +33,8 @@ public class ExchangeRateServlet extends HttpServlet {
     @Override
     public void init() {
         ServletContext servletContext = getServletContext();
-        this.instanceCurrency = (CurrencyDao) servletContext.getAttribute("instanceCurrency");
-        this.instanceExchangeRate = (ExchangeRateDao) servletContext.getAttribute("instanceExchangeRate");
+        this.instanceCurrency = (CurrencyDao) servletContext.getAttribute(INSTANCE_CURRENCY);
+        this.instanceExchangeRate = (ExchangeRateDao) servletContext.getAttribute(INSTANCE_EXCHANGE_RATE);
     }
 
     @Override

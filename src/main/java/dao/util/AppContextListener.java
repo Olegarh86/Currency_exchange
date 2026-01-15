@@ -4,10 +4,12 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import dao.CurrencyDao;
 import dao.ExchangeRateDao;
+import exception.ConnectionException;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -31,41 +33,12 @@ public class AppContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         try {
-            Properties props = new Properties();
-            try (InputStream is = getClass()
-                    .getClassLoader()
-                    .getResourceAsStream(APPLICATION_PROPERTIES)) {
-
-                if (is == null) {
-                    throw new RuntimeException(PROPERTIES_NOT_FOUND);
-                }
-                props.load(is);
-            }
-
-            try {
-                Class.forName(props.getProperty(DRIVER_KEY));
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-
-            HikariConfig config = new HikariConfig();
-            config.setJdbcUrl(props.getProperty(URL_KEY));
-            config.setUsername(props.getProperty(USER));
-            config.setPassword(props.getProperty(PASSWORD));
-            config.setConnectionTimeout(Long.parseLong(props.getProperty(TIMEOUT)));
-            int poolSize = Integer.parseInt(props.getProperty(POOL_SIZE_KEY));
-            if (poolSize <= 0) {
-                poolSize = Integer.parseInt(props.getProperty(DEFAULT_POOL_SIZE_KEY));
-            }
-            config.setMaximumPoolSize(poolSize);
-
-            hikariDataSource = new HikariDataSource(config);
-
-            event.getServletContext()
-                    .setAttribute(ATTRIBUTE_DATA_SOURCE, hikariDataSource);
-
+            Properties properties = loadProperties();
+            loadDriver(properties);
+            createConnectionPool(properties);
+            event.getServletContext().setAttribute(ATTRIBUTE_DATA_SOURCE, hikariDataSource);
         } catch (Exception e) {
-            throw new RuntimeException(DB_INIT_FAILED + e);
+            throw new ConnectionException(DB_INIT_FAILED + e);
         }
 
         CurrencyDao instanceCurrency = new CurrencyDao(hikariDataSource);
@@ -73,6 +46,43 @@ public class AppContextListener implements ServletContextListener {
 
         event.getServletContext().setAttribute(INSTANCE_CURRENCY, instanceCurrency);
         event.getServletContext().setAttribute(INSTANCE_EXCHANGE_RATE, instanceExchangeRate);
+    }
+
+    private Properties loadProperties() throws IOException {
+        Properties props = new Properties();
+        try (InputStream is = getClass()
+                .getClassLoader()
+                .getResourceAsStream(APPLICATION_PROPERTIES)) {
+
+            if (is == null) {
+                throw new RuntimeException(PROPERTIES_NOT_FOUND);
+            }
+            props.load(is);
+        }
+        return props;
+    }
+
+    private static void loadDriver(Properties properties) {
+        try {
+            Class.forName(properties.getProperty(DRIVER_KEY));
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createConnectionPool(Properties properties) {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(properties.getProperty(URL_KEY));
+        config.setUsername(properties.getProperty(USER));
+        config.setPassword(properties.getProperty(PASSWORD));
+        config.setConnectionTimeout(Long.parseLong(properties.getProperty(TIMEOUT)));
+        int poolSize = Integer.parseInt(properties.getProperty(POOL_SIZE_KEY));
+        if (poolSize <= 0) {
+            poolSize = Integer.parseInt(properties.getProperty(DEFAULT_POOL_SIZE_KEY));
+        }
+        config.setMaximumPoolSize(poolSize);
+
+        hikariDataSource = new HikariDataSource(config);
     }
 
     @Override

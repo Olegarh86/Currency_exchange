@@ -21,6 +21,8 @@ import static dao.util.Validator.validateInputParameters;
 
 @WebServlet(value = "/exchange", name = "ExchangeServlet")
 public class ExchangeServlet extends HttpServlet {
+    private static final String INSTANCE_CURRENCY = "instanceCurrency";
+    private static final String INSTANCE_EXCHANGE_RATE = "instanceExchangeRate";
     private static final String BASE_CODE_PARAMETER = "from";
     private static final String TARGET_CODE_PARAMETER = "to";
     private static final String AMOUNT_PARAMETER = "amount";
@@ -31,8 +33,8 @@ public class ExchangeServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         ServletContext servletContext = getServletContext();
-        this.instanceCurrency = (CurrencyDao) servletContext.getAttribute("instanceCurrency");
-        this.instanceExchangeRate = (ExchangeRateDao) servletContext.getAttribute("instanceExchangeRate");
+        this.instanceCurrency = (CurrencyDao) servletContext.getAttribute(INSTANCE_CURRENCY);
+        this.instanceExchangeRate = (ExchangeRateDao) servletContext.getAttribute(INSTANCE_EXCHANGE_RATE);
     }
 
     @Override

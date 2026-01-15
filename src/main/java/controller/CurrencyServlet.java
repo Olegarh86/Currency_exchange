@@ -20,13 +20,14 @@ import static dao.util.Validator.validateCode;
 
 @WebServlet(value = "/currency/*", name = "CurrencyServlet")
 public class CurrencyServlet extends HttpServlet {
+    private static final String INSTANCE_CURRENCY = "instanceCurrency";
     private CurrencyDao instanceCurrency;
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     @Override
     public void init() {
         ServletContext servletContext = getServletContext();
-        this.instanceCurrency = (CurrencyDao) servletContext.getAttribute("instanceCurrency");
+        this.instanceCurrency = (CurrencyDao) servletContext.getAttribute(INSTANCE_CURRENCY);
     }
 
     @Override
