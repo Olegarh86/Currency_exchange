@@ -11,22 +11,23 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class CurrencyDao implements dao.Currency {
+    private static final String ID = "id";
+    private static final String CODE = "code";
+    private static final String FULL_NAME = "full_name";
+    private static final String SIGN = "sign";
+    private static final String CURRENCY_NOT_FOUND = " currency not found";
     private final DataSource dataSource;
     private static final String INSERT_SQL = """
-            INSERT INTO currency (code, full_name, sign) 
+            INSERT INTO currency (code, full_name, sign)
             VALUES (?, ?, ?)
             """;
-    private static final String UPDATE_SQL = """
-            UPDATE currency
-            SET code = ?, full_name = ?, sign = ?
-            WHERE id = ?
-            """;
+
     private static final String FIND_ALL_SQL = """
             SELECT id, code, full_name, sign
             FROM currency
             """;
-    private static final String FIND_BY_ID_SQL = FIND_ALL_SQL + " WHERE id = ?";
     private static final String FIND_BY_CODE_SQL = FIND_ALL_SQL + " WHERE code = ?";
 
     public CurrencyDao(DataSource dataSource) {
@@ -49,7 +50,7 @@ public class CurrencyDao implements dao.Currency {
         try (PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(FIND_ALL_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                currencies.add(buildCurrencyResponseDto(resultSet.getInt("id"), resultSet));
+                currencies.add(buildCurrencyResponseDto(resultSet.getInt(ID), resultSet));
             }
             return currencies;
         } catch (SQLException e) {
@@ -58,9 +59,9 @@ public class CurrencyDao implements dao.Currency {
     }
 
     private static CurrenciesResponseDto buildCurrencyResponseDto(Integer id, ResultSet resultSet) throws SQLException {
-        return CurrencyMapper.INSTANCE.convertCurrencyToDto(new Currency(id, resultSet.getString("full_name"),
-                resultSet.getString("code"),
-                resultSet.getString("sign")));
+        return CurrencyMapper.INSTANCE.convertCurrencyToDto(new Currency(id, resultSet.getString(FULL_NAME),
+                resultSet.getString(CODE),
+                resultSet.getString(SIGN)));
     }
 
     public CurrenciesResponseDto findCurrencyByCode(String currencyCode) {
@@ -69,14 +70,14 @@ public class CurrencyDao implements dao.Currency {
             preparedStatement.setString(1, currencyCode);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                currenciesResponseDto = new CurrenciesResponseDto(resultSet.getInt("id"),
-                        resultSet.getString("full_name"),
-                        resultSet.getString("code"),
-                        resultSet.getString("sign"));
+                currenciesResponseDto = new CurrenciesResponseDto(resultSet.getInt(ID),
+                        resultSet.getString(FULL_NAME),
+                        resultSet.getString(CODE),
+                        resultSet.getString(SIGN));
             }
             return currenciesResponseDto;
         } catch (SQLException e) {
-            throw new DaoException(currencyCode + " currency not found");
+            throw new DaoException(currencyCode + CURRENCY_NOT_FOUND);
         }
     }
 
@@ -86,7 +87,7 @@ public class CurrencyDao implements dao.Currency {
         try (PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(FIND_ALL_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                currencies.add(buildCurrencyResponseDto(resultSet.getInt("id"), resultSet));
+                currencies.add(buildCurrencyResponseDto(resultSet.getInt(ID), resultSet));
             }
             return currencies;
         } catch (SQLException e) {

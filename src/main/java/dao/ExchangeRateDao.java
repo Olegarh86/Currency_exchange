@@ -12,6 +12,18 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public class ExchangeRateDao {
+    private static final String ID = "id";
+    private static final String BASE_ID = "base_id";
+    private static final String TARGET_ID = "target_id";
+    private static final String BASE_FULL_NAME = "base_full_name";
+    private static final String TARGET_FULL_NAME = "target_full_name";
+    private static final String BASE_CODE = "base_code";
+    private static final String TARGET_CODE = "target_code";
+    private static final String BASE_SIGN = "base_sign";
+    private static final String TARGET_SIGN = "target_sign";
+    private static final String RATE = "rate";
+    private static final String EXCHANGE_RATE_NOT_SAVED = "Exchange rate not saved: ";
+    private static final String THERE_IS_NO_SUCH_COURSE = "There is no such course";
     private final DataSource dataSource;
     private static final String INSERT_SQL = """
             INSERT INTO exchange_rate (base_currency_id, target_currency_id, rate)
@@ -47,7 +59,7 @@ public class ExchangeRateDao {
             preparedStatement.setBigDecimal(3, exchangeRateRequestDto.rate());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new DaoException("Exchange rate not saved: " + e.getMessage());
+            throw new DaoException(EXCHANGE_RATE_NOT_SAVED + e.getMessage());
         }
     }
 
@@ -67,15 +79,15 @@ public class ExchangeRateDao {
         try (PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(FIND_ALL_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                CurrenciesResponseDto baseDto = new CurrenciesResponseDto(resultSet.getInt("base_id"),
-                        resultSet.getString("base_full_name"), resultSet.getString("base_code"),
-                        resultSet.getString("base_sign"));
-                CurrenciesResponseDto targetDto = new CurrenciesResponseDto(resultSet.getInt("target_id"),
-                        resultSet.getString("target_full_name"), resultSet.getString("target_code"),
-                        resultSet.getString("target_sign"));
+                CurrenciesResponseDto baseDto = new CurrenciesResponseDto(resultSet.getInt(BASE_ID),
+                        resultSet.getString(BASE_FULL_NAME), resultSet.getString(BASE_CODE),
+                        resultSet.getString(BASE_SIGN));
+                CurrenciesResponseDto targetDto = new CurrenciesResponseDto(resultSet.getInt(TARGET_ID),
+                        resultSet.getString(TARGET_FULL_NAME), resultSet.getString(TARGET_CODE),
+                        resultSet.getString(TARGET_SIGN));
 
-                allRatesDto.add(new ExchangeRateResponseDto(resultSet.getInt("id"), baseDto, targetDto,
-                        resultSet.getBigDecimal("rate")));
+                allRatesDto.add(new ExchangeRateResponseDto(resultSet.getInt(ID), baseDto, targetDto,
+                        resultSet.getBigDecimal(RATE)));
             }
             return allRatesDto;
         } catch (SQLException e) {
@@ -90,15 +102,15 @@ public class ExchangeRateDao {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                CurrenciesResponseDto baseDto = new CurrenciesResponseDto(resultSet.getInt("base_id"),
-                        resultSet.getString("base_full_name"), resultSet.getString("base_code"),
-                        resultSet.getString("base_sign"));
-                CurrenciesResponseDto targetDto = new CurrenciesResponseDto(resultSet.getInt("target_id"),
-                        resultSet.getString("target_full_name"), resultSet.getString("target_code"),
-                        resultSet.getString("target_sign"));
-                return new ExchangeRateResponseDto(resultSet.getInt("id"), baseDto, targetDto, resultSet.getBigDecimal("rate"));
+                CurrenciesResponseDto baseDto = new CurrenciesResponseDto(resultSet.getInt(BASE_ID),
+                        resultSet.getString(BASE_FULL_NAME), resultSet.getString(BASE_CODE),
+                        resultSet.getString(BASE_SIGN));
+                CurrenciesResponseDto targetDto = new CurrenciesResponseDto(resultSet.getInt(TARGET_ID),
+                        resultSet.getString(TARGET_FULL_NAME), resultSet.getString(TARGET_CODE),
+                        resultSet.getString(TARGET_SIGN));
+                return new ExchangeRateResponseDto(resultSet.getInt(ID), baseDto, targetDto, resultSet.getBigDecimal(RATE));
             }
-            throw new NotFoundException("There is no such course");
+            throw new NotFoundException(THERE_IS_NO_SUCH_COURSE);
         } catch (SQLException | NoSuchElementException e) {
             throw new DaoException(e.getMessage());
         }
