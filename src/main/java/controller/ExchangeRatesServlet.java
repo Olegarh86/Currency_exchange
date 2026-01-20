@@ -8,14 +8,14 @@ import dto.ExchangeRateResponseDto;
 import dto.CurrenciesResponseDto;
 import dto.ExchangeRateRequestDto;
 import exception.AlreadyExistException;
+import exception.BadRequestException;
 import exception.DaoException;
 import exception.NotFoundException;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,7 +24,7 @@ import java.util.List;
 
 import static dao.util.Validator.validateExchangeRates;
 
-@WebServlet(value = "/exchangeRates", name = "ExchangeRatesServlet")
+@Slf4j
 public class ExchangeRatesServlet extends HttpServlet {
     private static final String INSTANCE_CURRENCY = "instanceCurrency";
     private static final String INSTANCE_EXCHANGE_RATE = "instanceExchangeRate";
@@ -69,12 +69,17 @@ public class ExchangeRatesServlet extends HttpServlet {
         } catch (DaoException e) {
             throw new NotFoundException(e.getMessage());
         }
-        validateExchangeRates(instanceExchangeRate, baseCode, targetCode, rate);
+        try {
+            validateExchangeRates(instanceExchangeRate, baseCode, targetCode, rate);
+        } catch (Exception e) {
+            throw new BadRequestException(e.getMessage());
+        }
         ExchangeRateResponseDto responseDto;
 
         try {
             instanceExchangeRate.save(new ExchangeRateRequestDto(baseCurrency, targetCurrency, rate));
             responseDto = instanceExchangeRate.findRateByCodes(baseCode, targetCode);
+            log.info("ExchangeRate saved successfully: {}", responseDto);
         } catch (DaoException e) {
             throw new AlreadyExistException(e.getMessage());
         }

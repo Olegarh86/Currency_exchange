@@ -6,12 +6,15 @@ import dto.ExchangeRateResponseDto;
 import dto.CurrenciesResponseDto;
 import dto.ExchangeResponseDto;
 import exception.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+@Slf4j
 public class Exchange {
     private static final String CODE_USD = "USD";
+    private static final String RATE_NOT_FOUND = "Exchange rate not found. Add exchange rate and try again.";
     private final CurrencyDao  currencyDao;
     private final ExchangeRateDao exchangeRateDao;
 
@@ -28,10 +31,6 @@ public class Exchange {
         BigDecimal rate = null;
         ExchangeRateResponseDto exchangeRateDto;
 
-        if (baseCode.equals(targetCode)) {
-            rate = BigDecimal.valueOf(1);
-        }
-
         if (rateIsExist) {
             exchangeRateDto = exchangeRateDao.findRateByCodes(baseCode, targetCode);
             rate = exchangeRateDto.rate();
@@ -47,7 +46,8 @@ public class Exchange {
         CurrenciesResponseDto targetCurrency = currencyDao.findCurrencyByCode(targetCode);
 
         if (rate == null) {
-            throw  new NotFoundException("Exchange rate not found. Add exchange rate and try again.");
+//            log.error("RATE_NOT_FOUND {} - {}", baseCode, targetCode );
+            throw  new NotFoundException(RATE_NOT_FOUND + baseCode +  targetCode);
         }
         BigDecimal result = amount.multiply(rate).setScale(2, RoundingMode.HALF_EVEN);
         return new ExchangeResponseDto(baseCurrency, targetCurrency, rate, amount, result);

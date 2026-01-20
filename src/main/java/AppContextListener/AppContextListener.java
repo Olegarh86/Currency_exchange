@@ -1,4 +1,4 @@
-package dao.util;
+package AppContextListener;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -8,11 +8,13 @@ import exception.ConnectionException;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+@Slf4j
 @WebListener
 public class AppContextListener implements ServletContextListener {
     private static final String APPLICATION_PROPERTIES = "application.properties";
@@ -27,6 +29,8 @@ public class AppContextListener implements ServletContextListener {
     private static final String ATTRIBUTE_DATA_SOURCE = "dataSource";
     private static final String DB_INIT_FAILED = "DB init failed";
     private static final String INSTANCE_CURRENCY = "instanceCurrency";
+    private static final String FAILED_TO_PROCESS_INIT_CONTEXT = "Failed to process init context";
+    private static final String FAILED_TO_PROCESS_LOAD_DRIVER = "Failed to process load driver";
     private static final String INSTANCE_EXCHANGE_RATE = "instanceExchangeRate";
     private HikariDataSource hikariDataSource;
 
@@ -37,7 +41,9 @@ public class AppContextListener implements ServletContextListener {
             loadDriver(properties);
             createConnectionPool(properties);
             event.getServletContext().setAttribute(ATTRIBUTE_DATA_SOURCE, hikariDataSource);
+            log.info("HikariDataSource created");
         } catch (Exception e) {
+            log.error(FAILED_TO_PROCESS_INIT_CONTEXT, e);
             throw new ConnectionException(DB_INIT_FAILED + e);
         }
 
@@ -53,7 +59,6 @@ public class AppContextListener implements ServletContextListener {
         try (InputStream is = getClass()
                 .getClassLoader()
                 .getResourceAsStream(APPLICATION_PROPERTIES)) {
-
             if (is == null) {
                 throw new RuntimeException(PROPERTIES_NOT_FOUND);
             }
@@ -66,6 +71,7 @@ public class AppContextListener implements ServletContextListener {
         try {
             Class.forName(properties.getProperty(DRIVER_KEY));
         } catch (ClassNotFoundException e) {
+            log.error(FAILED_TO_PROCESS_LOAD_DRIVER, e);
             throw new RuntimeException(e);
         }
     }
@@ -90,5 +96,6 @@ public class AppContextListener implements ServletContextListener {
         if (hikariDataSource != null) {
             hikariDataSource.close();
         }
+        log.info("HikariDataSource closed");
     }
 }

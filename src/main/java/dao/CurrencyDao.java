@@ -3,6 +3,7 @@ package dao;
 import dto.CurrenciesRequestDto;
 import dto.CurrenciesResponseDto;
 import exception.DaoException;
+import lombok.extern.slf4j.Slf4j;
 import mapper.CurrencyMapper;
 import model.Currency;
 
@@ -12,12 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class CurrencyDao implements dao.Currency {
+@Slf4j
+public class CurrencyDao {
     private static final String ID = "id";
     private static final String CODE = "code";
     private static final String FULL_NAME = "full_name";
     private static final String SIGN = "sign";
     private static final String CURRENCY_NOT_FOUND = " currency not found";
+    private static final String CURRENCY_ALREADY_EXIST = " currency already exist";
     private final DataSource dataSource;
     private static final String INSERT_SQL = """
             INSERT INTO currency (code, full_name, sign)
@@ -41,7 +44,7 @@ public class CurrencyDao implements dao.Currency {
             preparedStatement.setString(3, currenciesRequestDto.sign());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new DaoException(e.getMessage());
+            throw new DaoException(currenciesRequestDto.code() + CURRENCY_ALREADY_EXIST);
         }
     }
 
@@ -54,7 +57,7 @@ public class CurrencyDao implements dao.Currency {
             }
             return currencies;
         } catch (SQLException e) {
-            throw new DaoException(e.getMessage());
+            throw new DaoException(CURRENCY_NOT_FOUND + e.getMessage());
         }
     }
 
@@ -78,20 +81,6 @@ public class CurrencyDao implements dao.Currency {
             return currenciesResponseDto;
         } catch (SQLException e) {
             throw new DaoException(currencyCode + CURRENCY_NOT_FOUND);
-        }
-    }
-
-    @Override
-    public List<CurrenciesResponseDto> getAllCurrencies() {
-        List<CurrenciesResponseDto> currencies = new ArrayList<>();
-        try (PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(FIND_ALL_SQL)) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                currencies.add(buildCurrencyResponseDto(resultSet.getInt(ID), resultSet));
-            }
-            return currencies;
-        } catch (SQLException e) {
-            throw new DaoException(e.getMessage());
         }
     }
 }

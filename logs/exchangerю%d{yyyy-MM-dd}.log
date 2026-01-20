@@ -1,0 +1,270 @@
+2026-01-18 11:30:29 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-18 11:30:30 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-18 17:09:16 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-18 17:09:16 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-18 17:09:56 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET / null -> 304 (1768738196451 ms)
+2026-01-18 17:09:56 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /.well-known/appspecific/com.chrome.devtools.json null -> 404 (1768738196473 ms)
+2026-01-18 17:09:56 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /currencies null -> 200 (1768738196815 ms)
+2026-01-18 17:09:56 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /exchangeRates null -> 200 (1768738196891 ms)
+2026-01-18 17:10:07 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' PATCH /exchangeRate/USDJPY null -> 200 (1768738207651 ms)
+2026-01-18 17:10:12 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET / null -> 304 (1768738212301 ms)
+2026-01-18 17:10:12 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /.well-known/appspecific/com.chrome.devtools.json null -> 404 (1768738212328 ms)
+2026-01-18 17:10:12 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /currencies null -> 200 (1768738212402 ms)
+2026-01-18 17:10:12 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /exchangeRates null -> 200 (1768738212412 ms)
+2026-01-18 17:12:07 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET / null -> 304 (1768738327312 ms)
+2026-01-18 17:12:07 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /css/bootstrap.css null -> 304 (1768738327337 ms)
+2026-01-18 17:12:07 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /js/bootstrap.js null -> 304 (1768738327343 ms)
+2026-01-18 17:12:07 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /js/jquery-3.6.3.min.js null -> 304 (1768738327343 ms)
+2026-01-18 17:12:07 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /js/app.js null -> 304 (1768738327344 ms)
+2026-01-18 17:12:07 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /.well-known/appspecific/com.chrome.devtools.json null -> 404 (1768738327352 ms)
+2026-01-18 17:12:07 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /js/bootstrap.js.map null -> 304 (1768738327412 ms)
+2026-01-18 17:12:07 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /css/bootstrap.css.map null -> 304 (1768738327412 ms)
+2026-01-18 17:12:07 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /currencies null -> 200 (1768738327434 ms)
+2026-01-18 17:12:07 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /exchangeRates null -> 200 (1768738327437 ms)
+2026-01-18 17:12:15 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET / null -> 304 (1768738335251 ms)
+2026-01-18 17:12:15 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /.well-known/appspecific/com.chrome.devtools.json null -> 404 (1768738335283 ms)
+2026-01-18 17:12:15 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /currencies null -> 200 (1768738335363 ms)
+2026-01-18 17:12:15 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /exchangeRates null -> 200 (1768738335365 ms)
+2026-01-18 17:12:27 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' PATCH /exchangeRate/USDJPY null -> 200 (1768738347880 ms)
+2026-01-18 17:14:02 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-18 17:14:02 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-18 17:14:13 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' PATCH /exchangeRate/USDJPY -> 200 (1768738453167 ms)
+2026-01-18 17:15:28 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-18 17:15:28 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-18 17:15:33 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET / -> 304 (1768738533676 ms)
+2026-01-18 17:15:33 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /.well-known/appspecific/com.chrome.devtools.json -> 404 (1768738533695 ms)
+2026-01-18 17:15:34 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /currencies -> 200 (1768738534047 ms)
+2026-01-18 17:15:34 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /exchangeRates -> 200 (1768738534127 ms)
+2026-01-18 17:17:30 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET / -> 304 (1768738650397 ms)
+2026-01-18 17:17:30 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /.well-known/appspecific/com.chrome.devtools.json -> 404 (1768738650422 ms)
+2026-01-18 17:17:30 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /currencies -> 200 (1768738650498 ms)
+2026-01-18 17:17:30 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET /exchangeRates -> 200 (1768738650503 ms)
+2026-01-18 17:19:58 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-18 17:19:59 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-18 17:20:15 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-18 17:20:15 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-18 17:20:58 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET -> 304 (1768738858883 ms)
+2026-01-18 17:20:58 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET -> 404 (1768738858901 ms)
+2026-01-18 17:20:59 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET -> 200 (1768738859240 ms)
+2026-01-18 17:20:59 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET -> 200 (1768738859309 ms)
+2026-01-18 17:21:06 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET -> 304 (1768738866522 ms)
+2026-01-18 17:21:06 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET -> 404 (1768738866549 ms)
+2026-01-18 17:21:06 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET -> 200 (1768738866627 ms)
+2026-01-18 17:21:06 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET -> 200 (1768738866632 ms)
+2026-01-18 17:25:32 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-18 17:25:32 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-18 17:26:23 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:26:23 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:26:23 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:26:23 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET -> 304 (1768739183604 ms)
+2026-01-18 17:26:23 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:26:23 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:26:23 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:26:23 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:26:23 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET -> 404 (1768739183627 ms)
+2026-01-18 17:26:23 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:26:23 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:26:23 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:26:23 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:26:23 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:26:23 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:26:23 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:26:23 INFO  controller.CurrenciesServlet - CurrenciesServlet start
+2026-01-18 17:26:23 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:26:23 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET -> 200 (1768739183995 ms)
+2026-01-18 17:26:24 INFO  controller.filter.EncodingFilter - EncodingFilter exit
+2026-01-18 17:26:24 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:26:24 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' GET -> 200 (1768739184064 ms)
+2026-01-18 17:26:24 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:26:24 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:28:53 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-18 17:28:53 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-18 17:29:47 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:29:47 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:29:47 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:29:47 INFO  controller.CurrenciesServlet - CurrenciesServlet start
+2026-01-18 17:29:47 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:29:47 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (1768739387772 ms)
+2026-01-18 17:29:47 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:40:26 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-18 17:40:26 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-18 17:40:50 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:40:50 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:40:50 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:40:50 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 304 (1768740050254 ms)
+2026-01-18 17:40:50 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:40:50 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:40:50 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:40:50 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:40:50 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 404 (1768740050281 ms)
+2026-01-18 17:40:50 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:40:50 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:40:50 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:40:50 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:40:50 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:40:50 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:40:50 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:40:50 INFO  controller.CurrenciesServlet - CurrenciesServlet start
+2026-01-18 17:40:50 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:40:50 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (1768740050639 ms)
+2026-01-18 17:40:50 INFO  controller.filter.EncodingFilter - EncodingFilter exit
+2026-01-18 17:40:50 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:40:50 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (1768740050709 ms)
+2026-01-18 17:40:50 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:40:50 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:43:06 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-18 17:43:06 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-18 17:43:39 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:43:39 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:43:39 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:43:39 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 304 (1768740219276 ms)
+2026-01-18 17:43:39 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:43:39 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:43:39 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:43:39 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:43:39 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 404 (1768740219295 ms)
+2026-01-18 17:43:39 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:43:39 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:43:39 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:43:39 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:43:39 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:43:39 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:43:39 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:43:39 INFO  controller.CurrenciesServlet - CurrenciesServlet start
+2026-01-18 17:43:39 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:43:39 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (1768740219653 ms)
+2026-01-18 17:43:39 INFO  controller.filter.EncodingFilter - EncodingFilter exit
+2026-01-18 17:43:39 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:43:39 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (1768740219726 ms)
+2026-01-18 17:43:39 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:43:39 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:50:01 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-18 17:50:01 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-18 17:50:12 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:50:12 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:50:12 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:50:12 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 304 (1768740612347 ms)
+2026-01-18 17:50:12 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:50:12 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:50:12 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:50:12 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:50:12 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 404 (1768740612367 ms)
+2026-01-18 17:50:12 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:50:12 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:50:12 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:50:12 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:50:12 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:50:12 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:50:12 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:50:12 INFO  controller.CurrenciesServlet - CurrenciesServlet start
+2026-01-18 17:50:12 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:50:12 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (1768740612730 ms)
+2026-01-18 17:50:12 INFO  controller.filter.EncodingFilter - EncodingFilter exit
+2026-01-18 17:50:12 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:50:12 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (1768740612800 ms)
+2026-01-18 17:50:12 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:50:12 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:53:01 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-18 17:53:01 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-18 17:53:11 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Starting...
+2026-01-18 17:53:11 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Start completed.
+2026-01-18 17:54:18 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:54:18 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:54:18 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:54:18 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 304 (1768740858102 ms)
+2026-01-18 17:54:18 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:54:18 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:54:18 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:54:18 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:54:18 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 404 (1768740858134 ms)
+2026-01-18 17:54:18 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:54:18 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:54:18 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:54:18 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:54:18 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:54:18 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:54:18 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:54:18 INFO  controller.CurrenciesServlet - CurrenciesServlet start
+2026-01-18 17:54:18 INFO  controller.filter.EncodingFilter - EncodingFilter exit
+2026-01-18 17:54:18 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:54:18 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (1768740858472 ms)
+2026-01-18 17:54:18 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:54:18 INFO  controller.filter.EncodingFilter - EncodingFilter exit
+2026-01-18 17:54:18 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:54:18 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (1768740858478 ms)
+2026-01-18 17:54:18 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:54:27 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:54:27 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:54:27 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:54:27 INFO  controller.filter.EncodingFilter - EncodingFilter exit
+2026-01-18 17:54:27 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:54:27 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 PATCH -> 200 (1768740867826 ms)
+2026-01-18 17:54:27 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:54:30 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:54:30 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:54:30 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:54:30 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 304 (1768740870310 ms)
+2026-01-18 17:54:30 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:54:30 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:54:30 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:54:30 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:54:30 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 404 (1768740870339 ms)
+2026-01-18 17:54:30 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:54:30 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:54:30 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:54:30 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:54:30 INFO  controller.CurrenciesServlet - CurrenciesServlet start
+2026-01-18 17:54:30 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:54:30 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:54:30 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:54:30 INFO  controller.filter.EncodingFilter - EncodingFilter exit
+2026-01-18 17:54:30 INFO  controller.filter.EncodingFilter - EncodingFilter exit
+2026-01-18 17:54:30 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:54:30 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:54:30 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (1768740870416 ms)
+2026-01-18 17:54:30 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (1768740870416 ms)
+2026-01-18 17:54:30 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:54:30 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:56:47 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-18 17:56:47 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-18 17:58:45 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-18 17:58:45 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-18 17:58:49 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:58:49 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:58:49 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:58:49 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 304 (1768741129053 ms)
+2026-01-18 17:58:49 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:58:49 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:58:49 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:58:49 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:58:49 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 404 (1768741129072 ms)
+2026-01-18 17:58:49 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:58:49 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:58:49 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:58:49 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:58:49 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:58:49 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:58:49 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:58:49 INFO  controller.CurrenciesServlet - CurrenciesServlet start
+2026-01-18 17:58:49 INFO  controller.filter.EncodingFilter - EncodingFilter exit
+2026-01-18 17:58:49 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:58:49 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (1768741129543 ms)
+2026-01-18 17:58:49 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:58:49 INFO  controller.filter.EncodingFilter - EncodingFilter exit
+2026-01-18 17:58:49 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:58:49 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (1768741129555 ms)
+2026-01-18 17:58:49 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 17:58:57 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter enter
+2026-01-18 17:58:57 INFO  controller.filter.LoggingFilter - LoggingFilter start
+2026-01-18 17:58:57 INFO  controller.filter.EncodingFilter - EncodingFilter enter
+2026-01-18 17:58:57 INFO  controller.filter.EncodingFilter - EncodingFilter exit
+2026-01-18 17:58:57 INFO  controller.filter.LoggingFilter - LoggingFilter end
+2026-01-18 17:58:57 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 PATCH -> 200 (1768741137046 ms)
+2026-01-18 17:58:57 INFO  c.filter.ExceptionHandlerFilter - ExceptionHandlerFilter exit
+2026-01-18 18:02:11 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-18 18:02:11 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-18 18:02:24 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 304 (3 ms)
+2026-01-18 18:02:24 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 404 (1 ms)
+2026-01-18 18:02:24 INFO  controller.CurrenciesServlet - CurrenciesServlet start
+2026-01-18 18:02:24 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (99 ms)
+2026-01-18 18:02:24 INFO  controller.filter.LoggingFilter - 0:0:0:0:0:0:0:1 GET -> 200 (110 ms)

@@ -7,18 +7,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dao.CurrencyDao;
 import dto.CurrenciesResponseDto;
+import exception.BadRequestException;
 import exception.DaoException;
 import exception.NotFoundException;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import static dao.util.Validator.validateCode;
 
-@WebServlet(value = "/currency/*", name = "CurrencyServlet")
+@Slf4j
 public class CurrencyServlet extends HttpServlet {
     private static final String INSTANCE_CURRENCY = "instanceCurrency";
     private CurrencyDao instanceCurrency;
@@ -33,7 +33,11 @@ public class CurrencyServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String code = getCode(request);
-        validateCode(code);
+        try {
+            validateCode(code);
+        } catch (Exception e) {
+            throw new BadRequestException(e.getMessage());
+        }
 
         CurrenciesResponseDto result;
         try {

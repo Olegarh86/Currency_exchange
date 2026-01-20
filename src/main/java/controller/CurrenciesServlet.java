@@ -7,11 +7,12 @@ import dto.CurrenciesRequestDto;
 import dto.CurrenciesResponseDto;
 import exception.AlreadyExistException;
 import exception.DaoException;
+import exception.NotFoundException;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,7 +20,7 @@ import java.util.List;
 
 import static dao.util.Validator.validateCurrency;
 
-@WebServlet(value = "/currencies", name = "CurrenciesServlet")
+@Slf4j
 public class CurrenciesServlet extends HttpServlet {
     private static final String NAME_PARAMETER = "name";
     private static final String CODE_PARAMETER = "code";
@@ -40,7 +41,7 @@ public class CurrenciesServlet extends HttpServlet {
         try {
             currencies = instanceCurrency.findAll();
         } catch (DaoException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new NotFoundException(e.getMessage());
         }
         PrintWriter out = response.getWriter();
         response.setStatus(HttpServletResponse.SC_OK);
@@ -52,12 +53,13 @@ public class CurrenciesServlet extends HttpServlet {
         String name = request.getParameter(NAME_PARAMETER);
         String code = request.getParameter(CODE_PARAMETER).toUpperCase();
         String sign = request.getParameter(SIGN_PARAMETER);
-        validateCurrency(code, name, sign);
+        validateCurrency(code, name);
 
         CurrenciesResponseDto responseDto;
         try {
             instanceCurrency.save(new CurrenciesRequestDto(name, code, sign));
             responseDto = instanceCurrency.findCurrencyByCode(code);
+            log.info("Currency create successful: {}", responseDto);
         } catch (DaoException e) {
             throw new AlreadyExistException(e.getMessage());
         }

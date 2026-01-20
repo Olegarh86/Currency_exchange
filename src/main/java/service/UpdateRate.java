@@ -6,9 +6,11 @@ import dto.Codes;
 import dto.CurrenciesResponseDto;
 import exception.DaoException;
 import exception.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 
+@Slf4j
 public class UpdateRate {
     private final CurrencyDao instanceCurrency;
     private final ExchangeRateDao instanceExchangeRate;
@@ -35,6 +37,7 @@ public class UpdateRate {
         try {
             instanceExchangeRate.updateRate(baseDto.id(), targetDto.id(), amount);
         } catch (DaoException e) {
+            log.error("Failed to process update rate {}", instanceExchangeRate);
             throw new NotFoundException(e.getMessage());
         }
     }

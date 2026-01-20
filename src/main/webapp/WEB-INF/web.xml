@@ -4,4 +4,97 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
 
+    <!-- ================= FILTERS ================= -->
+
+    <!-- Logging + MDC -->
+    <filter>
+        <filter-name>LoggingFilter</filter-name>
+        <filter-class>controller.filter.LoggingFilter</filter-class>
+    </filter>
+
+    <!-- Exception handler -->
+    <filter>
+        <filter-name>ExceptionHandlerFilter</filter-name>
+        <filter-class>controller.filter.ExceptionHandlerFilter</filter-class>
+    </filter>
+
+    <!-- Encoding -->
+    <filter>
+        <filter-name>EncodingFilter</filter-name>
+        <filter-class>controller.filter.EncodingFilter</filter-class>
+    </filter>
+
+    <!-- ===== FILTER ORDER (VERY IMPORTANT) ===== -->
+
+    <filter-mapping>
+        <filter-name>LoggingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>ExceptionHandlerFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>EncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+    <!-- ================= SERVLETS ================= -->
+
+    <servlet>
+        <servlet-name>CurrenciesServlet</servlet-name>
+        <servlet-class>controller.CurrenciesServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>CurrencyServlet</servlet-name>
+        <servlet-class>controller.CurrencyServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ExchangeRateServlet</servlet-name>
+        <servlet-class>controller.ExchangeRateServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ExchangeRatesServlet</servlet-name>
+        <servlet-class>controller.ExchangeRatesServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ExchangeServlet</servlet-name>
+        <servlet-class>controller.ExchangeServlet</servlet-class>
+    </servlet>
+
+
+    <!-- ============== SERVLET MAPPINGS ============== -->
+
+    <servlet-mapping>
+        <servlet-name>CurrenciesServlet</servlet-name>
+        <url-pattern>/currencies</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>CurrencyServlet</servlet-name>
+        <url-pattern>/currency/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ExchangeRateServlet</servlet-name>
+        <url-pattern>/exchangeRate/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ExchangeRatesServlet</servlet-name>
+        <url-pattern>/exchangeRates</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ExchangeServlet</servlet-name>
+        <url-pattern>/exchange</url-pattern>
+    </servlet-mapping>
+
 </web-app>

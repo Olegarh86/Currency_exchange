@@ -1,17 +1,18 @@
 package controller.filter;
 
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
-@WebFilter(servletNames = {"CurrenciesServlet", "CurrencyServlet", "ExchangeRateServlet",
-        "ExchangeRatesServlet", "ExchangeServlet"})
+@Slf4j
 public class EncodingFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        log.debug("EncodingFilter enter");
         servletResponse.setContentType("application/json;charset=UTF-8");
         filterChain.doFilter(servletRequest, servletResponse);
+        log.debug("EncodingFilter exit");
     }
 }

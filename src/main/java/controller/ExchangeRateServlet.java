@@ -6,14 +6,15 @@ import dao.CurrencyDao;
 import dao.ExchangeRateDao;
 import dto.Codes;
 import dto.ExchangeRateResponseDto;
+import exception.BadRequestException;
 import exception.DaoException;
 import exception.NotFoundException;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.UpdateRate;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,7 +23,7 @@ import java.math.BigDecimal;
 
 import static dao.util.Validator.*;
 
-@WebServlet(value = "/exchangeRate/*", name = "ExchangeRateServlet")
+@Slf4j
 public class ExchangeRateServlet extends HttpServlet {
     private static final String INSTANCE_CURRENCY = "instanceCurrency";
     private static final String INSTANCE_EXCHANGE_RATE = "instanceExchangeRate";
@@ -40,8 +41,12 @@ public class ExchangeRateServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Codes codes = getCodes(request);
-        validateCode(codes.baseCode());
-        validateCode(codes.targetCode());
+        try {
+            validateCode(codes.baseCode());
+            validateCode(codes.targetCode());
+        } catch (Exception e) {
+            throw new BadRequestException(e.getMessage());
+        }
 
         ExchangeRateResponseDto exchangeRateDto;
         try {
@@ -58,7 +63,11 @@ public class ExchangeRateServlet extends HttpServlet {
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String rate = getStringRate(request);
         Codes codes = getCodes(request);
-        validateInputParameters(codes.baseCode(), codes.targetCode(), rate);
+        try {
+            validateInputParameters(codes.baseCode(), codes.targetCode(), rate);
+        } catch (Exception e) {
+            throw new BadRequestException(e.getMessage());
+        }
         BigDecimal newRate = new BigDecimal(rate);
 
         UpdateRate updateRate = new UpdateRate(instanceCurrency, instanceExchangeRate, codes, newRate);
@@ -66,6 +75,7 @@ public class ExchangeRateServlet extends HttpServlet {
         ExchangeRateResponseDto exchangeRateDto;
         try {
             exchangeRateDto = instanceExchangeRate.findRateByCodes(codes.baseCode(), codes.targetCode());
+            log.info("ExchangeRate updated successfully: {}", exchangeRateDto);
         } catch (DaoException e) {
             throw new NotFoundException(e.getMessage());
         }
