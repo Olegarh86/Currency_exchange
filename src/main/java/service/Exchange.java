@@ -2,9 +2,7 @@ package service;
 
 import dao.CurrencyDao;
 import dao.ExchangeRateDao;
-import dto.ExchangeRateResponseDto;
-import dto.CurrenciesResponseDto;
-import dto.ExchangeResponseDto;
+import dto.*;
 import exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,8 +11,9 @@ import java.math.RoundingMode;
 
 @Slf4j
 public class Exchange {
-    private static final String CODE_USD = "USD";
+    private static final CurrencyDto USD_DTO = new CurrencyRequestDto("USD");
     private static final String RATE_NOT_FOUND = "Exchange rate not found. Add exchange rate and try again.";
+    private static final int SCALE = 6;
     private final CurrencyDao  currencyDao;
     private final ExchangeRateDao exchangeRateDao;
 
@@ -23,33 +22,32 @@ public class Exchange {
         this.exchangeRateDao = exchangeRateDao;
     }
 
-    public ExchangeResponseDto convert(String baseCode, String targetCode, BigDecimal amount) {
-        boolean rateIsExist = exchangeRateDao.rateIsExist(baseCode, targetCode);
-        boolean reverseRateIsExist = exchangeRateDao.rateIsExist(targetCode, baseCode);
-        boolean crossRateIsExist = (exchangeRateDao.rateIsExist(CODE_USD, baseCode) &&
-                                    exchangeRateDao.rateIsExist(CODE_USD, targetCode));
-        BigDecimal rate = null;
-        ExchangeRateResponseDto exchangeRateDto;
+    public ExchangeResponseDto convert(CurrencyDto currencyDtoBase, CurrencyDto currencyDtoTarget, BigDecimal amount) {
+        BigDecimal rate;
+        ExchangeRateDto exchangeRateDto;
 
-        if (rateIsExist) {
-            exchangeRateDto = exchangeRateDao.findRateByCodes(baseCode, targetCode);
-            rate = exchangeRateDto.rate();
-        } else if (reverseRateIsExist) {
-            exchangeRateDto = exchangeRateDao.findRateByCodes(targetCode, baseCode);
-            rate = BigDecimal.ONE.divide(exchangeRateDto.rate(), 6, RoundingMode.HALF_UP);
-        } else if (crossRateIsExist) {
-            ExchangeRateResponseDto exchangeRateFrom = exchangeRateDao.findRateByCodes(CODE_USD, baseCode);
-            ExchangeRateResponseDto exchangeRateTo = exchangeRateDao.findRateByCodes(CODE_USD, targetCode);
-            rate = exchangeRateTo.rate().divide(exchangeRateFrom.rate(), 6, RoundingMode.HALF_EVEN);
+        try {
+            exchangeRateDto = exchangeRateDao.findExchangeRate(currencyDtoBase, currencyDtoTarget);
+            rate = exchangeRateDto.getRate();
+        } catch (Exception e) {
+            try {
+                exchangeRateDto = exchangeRateDao.findExchangeRate(currencyDtoTarget, currencyDtoBase);
+                rate = BigDecimal.ONE.divide(exchangeRateDto.getRate(), SCALE, RoundingMode.HALF_UP);
+            } catch (Exception ex) {
+                try {
+                    ExchangeRateDto exchangeRateFrom = exchangeRateDao.findExchangeRate(USD_DTO, currencyDtoBase);
+                    ExchangeRateDto exchangeRateTo = exchangeRateDao.findExchangeRate(USD_DTO, currencyDtoTarget);
+                    rate = exchangeRateTo.getRate().divide(exchangeRateFrom.getRate(), SCALE, RoundingMode.HALF_EVEN);
+                } catch (Exception exc) {
+                    throw  new NotFoundException(RATE_NOT_FOUND + currencyDtoBase + currencyDtoTarget);
+                }
+            }
         }
-        CurrenciesResponseDto baseCurrency = currencyDao.findCurrencyByCode(baseCode);
-        CurrenciesResponseDto targetCurrency = currencyDao.findCurrencyByCode(targetCode);
 
-        if (rate == null) {
-//            log.error("RATE_NOT_FOUND {} - {}", baseCode, targetCode );
-            throw  new NotFoundException(RATE_NOT_FOUND + baseCode +  targetCode);
-        }
-        BigDecimal result = amount.multiply(rate).setScale(2, RoundingMode.HALF_EVEN);
+        CurrencyDto baseCurrency = currencyDao.findCurrencyByCode(currencyDtoBase);
+        CurrencyDto targetCurrency = currencyDao.findCurrencyByCode(currencyDtoTarget);
+
+        BigDecimal result = amount.multiply(rate).setScale(SCALE, RoundingMode.HALF_EVEN);
         return new ExchangeResponseDto(baseCurrency, targetCurrency, rate, amount, result);
     }
 }

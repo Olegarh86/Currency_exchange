@@ -11,6 +11,14 @@ import java.util.UUID;
 
 @Slf4j
 public class LoggingFilter implements Filter {
+    private static final String REQUEST_ID_HEADER = "X-Request-ID";
+    private static final String REQUEST_ID_MDC = "requestId";
+    private static final String IP = "ip";
+    private static final String URI = "uri";
+    private static final String METHOD = "method";
+    private static final String SLOW_REQUEST = "slow request {}";
+    private static final String STATUS_AND_SPEED = "status: {} -> ({} ms)";
+    private static final int MAX_PENDING_MS = 1000;
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
@@ -18,27 +26,26 @@ public class LoggingFilter implements Filter {
         long start = System.currentTimeMillis();
         long time = 0;
         try {
-            String requestId = req.getHeader("X-Request-ID");
+            String requestId = req.getHeader(REQUEST_ID_HEADER);
 
             if (requestId == null) {
                 requestId = UUID.randomUUID().toString();
             }
-            MDC.put("requestId", requestId);
-            MDC.put("ip", req.getRemoteAddr());
-            MDC.put("uri", req.getRequestURI());
-            MDC.put("method", req.getMethod());
-            res.setHeader("X-Request-ID", requestId);
+            MDC.put(REQUEST_ID_MDC, requestId);
+            MDC.put(IP, req.getRemoteAddr());
+            MDC.put(URI, req.getRequestURI());
+            MDC.put(METHOD, req.getMethod());
+            res.setHeader(REQUEST_ID_HEADER, requestId);
             filterChain.doFilter(servletRequest, servletResponse);
             long finish = System.currentTimeMillis();
             time = finish - start;
 
-            if (time > 1000) {
-                log.warn("slow request {}", requestId);
+            if (time > MAX_PENDING_MS) {
+                log.warn(SLOW_REQUEST, requestId);
             }
         } finally {
-            log.info("status: {} -> ({} ms)", res.getStatus(),  time);
+            log.info(STATUS_AND_SPEED, res.getStatus(), time);
             MDC.clear();
         }
-
     }
 }

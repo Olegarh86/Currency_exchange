@@ -6,7 +6,8 @@ import java.io.PrintWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dao.CurrencyDao;
-import dto.CurrenciesResponseDto;
+import dto.CurrencyDto;
+import dto.CurrencyRequestDto;
 import exception.BadRequestException;
 import exception.DaoException;
 import exception.NotFoundException;
@@ -16,7 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
-import static dao.util.Validator.validateCode;
+import static util.Validator.validateCode;
 
 @Slf4j
 public class CurrencyServlet extends HttpServlet {
@@ -33,15 +34,12 @@ public class CurrencyServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String code = getCode(request);
-        try {
-            validateCode(code);
-        } catch (Exception e) {
-            throw new BadRequestException(e.getMessage());
-        }
 
-        CurrenciesResponseDto result;
+        validateCode(code);
+        CurrencyDto currencyRequestDto = new CurrencyRequestDto(code);
+        CurrencyDto result;
         try {
-            result = instanceCurrency.findCurrencyByCode(code);
+            result = instanceCurrency.findCurrencyByCode(currencyRequestDto);
         } catch (DaoException e) {
             throw new NotFoundException(e.getMessage());
         }

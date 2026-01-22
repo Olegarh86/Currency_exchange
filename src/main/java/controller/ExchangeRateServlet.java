@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dao.CurrencyDao;
 import dao.ExchangeRateDao;
-import dto.Codes;
-import dto.ExchangeRateResponseDto;
-import exception.BadRequestException;
+import dto.*;
 import exception.DaoException;
 import exception.NotFoundException;
 import jakarta.servlet.ServletContext;
@@ -21,12 +19,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 
-import static dao.util.Validator.*;
+import static util.Validator.*;
 
 @Slf4j
 public class ExchangeRateServlet extends HttpServlet {
     private static final String INSTANCE_CURRENCY = "instanceCurrency";
     private static final String INSTANCE_EXCHANGE_RATE = "instanceExchangeRate";
+    private static final String UPDATED_SUCCESSFULLY = "ExchangeRate updated successfully: {}";
+    private static final int INDEX_START_RATE = 5;
+    private static final int CODE_LENGTH = 3;
     private ExchangeRateDao instanceExchangeRate;
     private CurrencyDao instanceCurrency;
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
@@ -41,47 +42,44 @@ public class ExchangeRateServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Codes codes = getCodes(request);
-        try {
-            validateCode(codes.baseCode());
-            validateCode(codes.targetCode());
-        } catch (Exception e) {
-            throw new BadRequestException(e.getMessage());
-        }
+        validateCode(codes.baseCode());
+        validateCode(codes.targetCode());
 
-        ExchangeRateResponseDto exchangeRateDto;
+        CurrencyDto currencyDtoBase = new CurrencyRequestDto(codes.baseCode());
+        CurrencyDto currencyDtoTarget = new CurrencyRequestDto(codes.targetCode());
+        ExchangeRateDto result;
         try {
-            exchangeRateDto = instanceExchangeRate.findRateByCodes(codes.baseCode(), codes.targetCode());
+            result = instanceExchangeRate.findExchangeRate(currencyDtoBase, currencyDtoTarget);
         } catch (DaoException e) {
             throw new NotFoundException(e.getMessage());
         }
         PrintWriter out = response.getWriter();
         response.setStatus(HttpServletResponse.SC_OK);
-        mapper.writeValue(out, exchangeRateDto);
+        mapper.writeValue(out, result);
     }
 
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String rate = getStringRate(request);
         Codes codes = getCodes(request);
-        try {
-            validateInputParameters(codes.baseCode(), codes.targetCode(), rate);
-        } catch (Exception e) {
-            throw new BadRequestException(e.getMessage());
-        }
+
+        validateInputParameters(codes.baseCode(), codes.targetCode(), rate);
         BigDecimal newRate = new BigDecimal(rate);
 
         UpdateRate updateRate = new UpdateRate(instanceCurrency, instanceExchangeRate, codes, newRate);
         updateRate.update();
-        ExchangeRateResponseDto exchangeRateDto;
+        ExchangeRateDto result;
+        CurrencyDto currencyDtoBase = new CurrencyRequestDto(codes.baseCode());
+        CurrencyDto currencyDtoTarget = new CurrencyRequestDto(codes.targetCode());
         try {
-            exchangeRateDto = instanceExchangeRate.findRateByCodes(codes.baseCode(), codes.targetCode());
-            log.info("ExchangeRate updated successfully: {}", exchangeRateDto);
+            result = instanceExchangeRate.findExchangeRate(currencyDtoBase, currencyDtoTarget);
+            log.info(UPDATED_SUCCESSFULLY, result);
         } catch (DaoException e) {
             throw new NotFoundException(e.getMessage());
         }
         response.setStatus(HttpServletResponse.SC_OK);
         PrintWriter out = response.getWriter();
-        mapper.writeValue(out, exchangeRateDto);
+        mapper.writeValue(out, result);
     }
 
     private static String getStringRate(HttpServletRequest request) throws IOException {
@@ -91,14 +89,14 @@ public class ExchangeRateServlet extends HttpServlet {
         while ((line = reader.readLine()) != null) {
             body.append(line);
         }
-        return body.substring(5, body.length());
+        return body.substring(INDEX_START_RATE, body.length());
     }
 
     private static Codes getCodes(HttpServletRequest request) {
         String codes = request.getRequestURI();
         codes = codes.substring(codes.lastIndexOf('/') + 1).toUpperCase();
-        String baseCode = codes.substring(0, 3).toUpperCase();
-        String targetCode = codes.substring(3).toUpperCase();
+        String baseCode = codes.substring(0, CODE_LENGTH).toUpperCase();
+        String targetCode = codes.substring(CODE_LENGTH).toUpperCase();
         return new Codes(baseCode, targetCode);
     }
 }

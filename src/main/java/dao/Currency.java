@@ -1,10 +1,8 @@
 package dao;
 
-import dto.CurrenciesResponseDto;
+import dto.CurrencyResponseDto;
 
 import java.util.List;
 
 public interface Currency {
-
-    List<CurrenciesResponseDto> getAllCurrencies();
 }

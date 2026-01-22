@@ -4,11 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dao.CurrencyDao;
 import dao.ExchangeRateDao;
-import dto.ExchangeRateResponseDto;
-import dto.CurrenciesResponseDto;
-import dto.ExchangeRateRequestDto;
+import dto.*;
 import exception.AlreadyExistException;
-import exception.BadRequestException;
 import exception.DaoException;
 import exception.NotFoundException;
 import jakarta.servlet.ServletContext;
@@ -22,7 +19,7 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static dao.util.Validator.validateExchangeRates;
+import static util.Validator.validateInputParameters;
 
 @Slf4j
 public class ExchangeRatesServlet extends HttpServlet {
@@ -31,6 +28,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     private static final String BASE_CODE_PARAMETER = "baseCurrencyCode";
     private static final String TARGET_CODE_PARAMETER = "targetCurrencyCode";
     private static final String RATE_PARAMETER = "rate";
+    private static final String SAVED_SUCCESSFULLY = "ExchangeRate saved successfully: {}";
     private CurrencyDao instanceCurrency;
     private ExchangeRateDao instanceExchangeRate;
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
@@ -44,42 +42,44 @@ public class ExchangeRatesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        List<ExchangeRateResponseDto> exchangeRateResponseDto;
+        List<ExchangeRateDto> result;
         try {
-            exchangeRateResponseDto = instanceExchangeRate.findAll();
-        } catch (Exception e) {
+            result = instanceExchangeRate.findAll();
+        } catch (DaoException e) {
             throw new RuntimeException(e);
         }
         PrintWriter out = response.getWriter();
         response.setStatus(HttpServletResponse.SC_OK);
-        mapper.writeValue(out, exchangeRateResponseDto);
+        mapper.writeValue(out, result);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String baseCode = request.getParameter(BASE_CODE_PARAMETER).toUpperCase();
         String targetCode = request.getParameter(TARGET_CODE_PARAMETER).toUpperCase();
-        BigDecimal rate = new BigDecimal(request.getParameter(RATE_PARAMETER));
+        String rateString = request.getParameter(RATE_PARAMETER);
 
-        CurrenciesResponseDto baseCurrency;
-        CurrenciesResponseDto targetCurrency;
+        validateInputParameters(baseCode, targetCode, rateString);
+        BigDecimal rate = new BigDecimal(rateString);
+
+        CurrencyDto baseCurrency;
+        CurrencyDto targetCurrency;
+        CurrencyDto currencyRequestDtoBase = new CurrencyRequestDto(baseCode);
+        CurrencyDto currencyRequestDtoTarget = new CurrencyRequestDto(targetCode);
+
         try {
-            baseCurrency = instanceCurrency.findCurrencyByCode(baseCode);
-            targetCurrency = instanceCurrency.findCurrencyByCode(targetCode);
+            baseCurrency = instanceCurrency.findCurrencyByCode(currencyRequestDtoBase);
+            targetCurrency = instanceCurrency.findCurrencyByCode(currencyRequestDtoTarget);
         } catch (DaoException e) {
             throw new NotFoundException(e.getMessage());
         }
-        try {
-            validateExchangeRates(instanceExchangeRate, baseCode, targetCode, rate);
-        } catch (Exception e) {
-            throw new BadRequestException(e.getMessage());
-        }
-        ExchangeRateResponseDto responseDto;
+        instanceExchangeRate.validateRatesExistence(currencyRequestDtoBase, currencyRequestDtoTarget);
+        ExchangeRateDto responseDto;
 
         try {
             instanceExchangeRate.save(new ExchangeRateRequestDto(baseCurrency, targetCurrency, rate));
-            responseDto = instanceExchangeRate.findRateByCodes(baseCode, targetCode);
-            log.info("ExchangeRate saved successfully: {}", responseDto);
+            responseDto = instanceExchangeRate.findExchangeRate(currencyRequestDtoBase, currencyRequestDtoTarget);
+            log.info(SAVED_SUCCESSFULLY, responseDto);
         } catch (DaoException e) {
             throw new AlreadyExistException(e.getMessage());
         }

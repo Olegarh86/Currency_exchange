@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dao.CurrencyDao;
 import dao.ExchangeRateDao;
+import dto.CurrencyDto;
+import dto.CurrencyRequestDto;
 import dto.ExchangeResponseDto;
 import exception.BadRequestException;
 import jakarta.servlet.ServletContext;
@@ -17,7 +19,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 
-import static dao.util.Validator.validateInputParameters;
+import static util.Validator.validateInputParameters;
 
 @Slf4j
 public class ExchangeServlet extends HttpServlet {
@@ -26,6 +28,7 @@ public class ExchangeServlet extends HttpServlet {
     private static final String BASE_CODE_PARAMETER = "from";
     private static final String TARGET_CODE_PARAMETER = "to";
     private static final String AMOUNT_PARAMETER = "amount";
+    private static final String DONE_RESULT_IS = "Exchange is done, result is: {}";
     private CurrencyDao instanceCurrency;
     private ExchangeRateDao instanceExchangeRate;
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
@@ -41,16 +44,15 @@ public class ExchangeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String baseCode = request.getParameter(BASE_CODE_PARAMETER);
         String targetCode = request.getParameter(TARGET_CODE_PARAMETER);
-        BigDecimal amount = new BigDecimal(request.getParameter(AMOUNT_PARAMETER));
-        try {
-            validateInputParameters(baseCode, targetCode, amount);
-        } catch (Exception e) {
-            throw new BadRequestException(e.getMessage());
-        }
+        String amountString = request.getParameter(AMOUNT_PARAMETER);
 
+        validateInputParameters(baseCode, targetCode, amountString);
+        BigDecimal amount = new BigDecimal(amountString);
         Exchange exchange = new Exchange(instanceCurrency, instanceExchangeRate);
-        ExchangeResponseDto result = exchange.convert(baseCode, targetCode, amount);
-        log.info("Exchange is done, result is: {}", result);
+        CurrencyDto currencyDtoBase = new CurrencyRequestDto(baseCode);
+        CurrencyDto currencyDtoTarget = new CurrencyRequestDto(targetCode);
+        ExchangeResponseDto result = exchange.convert(currencyDtoBase, currencyDtoTarget, amount);
+        log.info(DONE_RESULT_IS, result);
         PrintWriter out = response.getWriter();
         mapper.writeValue(out, result);
     }

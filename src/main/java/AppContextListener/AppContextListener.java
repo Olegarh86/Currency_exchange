@@ -32,6 +32,8 @@ public class AppContextListener implements ServletContextListener {
     private static final String FAILED_TO_PROCESS_INIT_CONTEXT = "Failed to process init context";
     private static final String FAILED_TO_PROCESS_LOAD_DRIVER = "Failed to process load driver";
     private static final String INSTANCE_EXCHANGE_RATE = "instanceExchangeRate";
+    private static final String SOURCE_CREATED = "HikariDataSource created";
+    private static final String SOURCE_CLOSED = "HikariDataSource closed";
     private HikariDataSource hikariDataSource;
 
     @Override
@@ -41,7 +43,7 @@ public class AppContextListener implements ServletContextListener {
             loadDriver(properties);
             createConnectionPool(properties);
             event.getServletContext().setAttribute(ATTRIBUTE_DATA_SOURCE, hikariDataSource);
-            log.info("HikariDataSource created");
+            log.info(SOURCE_CREATED);
         } catch (Exception e) {
             log.error(FAILED_TO_PROCESS_INIT_CONTEXT, e);
             throw new ConnectionException(DB_INIT_FAILED + e);
@@ -96,6 +98,6 @@ public class AppContextListener implements ServletContextListener {
         if (hikariDataSource != null) {
             hikariDataSource.close();
         }
-        log.info("HikariDataSource closed");
+        log.info(SOURCE_CLOSED);
     }
 }

@@ -3,8 +3,9 @@ package controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dao.CurrencyDao;
-import dto.CurrenciesRequestDto;
-import dto.CurrenciesResponseDto;
+//import dto.CurrenciesRequestDto;
+import dto.CurrencyDto;
+import dto.CurrencyRequestDto;
 import exception.AlreadyExistException;
 import exception.DaoException;
 import exception.NotFoundException;
@@ -18,7 +19,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import static dao.util.Validator.validateCurrency;
+import static util.Validator.validateCurrency;
 
 @Slf4j
 public class CurrenciesServlet extends HttpServlet {
@@ -26,6 +27,7 @@ public class CurrenciesServlet extends HttpServlet {
     private static final String CODE_PARAMETER = "code";
     private static final String SIGN_PARAMETER = "sign";
     private static final String INSTANCE_CURRENCY = "instanceCurrency";
+    private static final String CREATE_SUCCESSFUL = "Currency create successful: {}";
     private CurrencyDao instanceCurrency;
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
@@ -37,15 +39,15 @@ public class CurrenciesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        List<CurrenciesResponseDto> currencies;
+        List<CurrencyDto> result;
         try {
-            currencies = instanceCurrency.findAll();
+            result = instanceCurrency.findAll();
         } catch (DaoException e) {
             throw new NotFoundException(e.getMessage());
         }
         PrintWriter out = response.getWriter();
         response.setStatus(HttpServletResponse.SC_OK);
-        mapper.writeValue(out, currencies);
+        mapper.writeValue(out, result);
     }
 
     @Override
@@ -53,18 +55,19 @@ public class CurrenciesServlet extends HttpServlet {
         String name = request.getParameter(NAME_PARAMETER);
         String code = request.getParameter(CODE_PARAMETER).toUpperCase();
         String sign = request.getParameter(SIGN_PARAMETER);
-        validateCurrency(code, name);
 
-        CurrenciesResponseDto responseDto;
+        validateCurrency(code, name);
+        CurrencyDto currencyRequestDto = new CurrencyRequestDto(name, code, sign);
+        CurrencyDto result;
         try {
-            instanceCurrency.save(new CurrenciesRequestDto(name, code, sign));
-            responseDto = instanceCurrency.findCurrencyByCode(code);
-            log.info("Currency create successful: {}", responseDto);
+            instanceCurrency.save(currencyRequestDto);
+            result = instanceCurrency.findCurrencyByCode(currencyRequestDto);
+            log.info(CREATE_SUCCESSFUL, result);
         } catch (DaoException e) {
             throw new AlreadyExistException(e.getMessage());
         }
         PrintWriter out = response.getWriter();
         response.setStatus(HttpServletResponse.SC_CREATED);
-        mapper.writeValue(out, responseDto);
+        mapper.writeValue(out, result);
     }
 }

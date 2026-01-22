@@ -2,8 +2,7 @@ package service;
 
 import dao.CurrencyDao;
 import dao.ExchangeRateDao;
-import dto.Codes;
-import dto.CurrenciesResponseDto;
+import dto.*;
 import exception.DaoException;
 import exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -25,19 +24,21 @@ public class UpdateRate {
     }
 
     public void update() {
-        CurrenciesResponseDto baseDto;
-        CurrenciesResponseDto targetDto;
+        CurrencyDto baseDto;
+        CurrencyDto targetDto;
         try {
-            baseDto = instanceCurrency.findCurrencyByCode(codes.baseCode());
-            targetDto = instanceCurrency.findCurrencyByCode(codes.targetCode());
+            CurrencyRequestDto currencyRequestDtoBase = new CurrencyRequestDto(codes.baseCode());
+            CurrencyRequestDto currencyRequestDtoTarget = new CurrencyRequestDto(codes.targetCode());
+            baseDto = instanceCurrency.findCurrencyByCode(currencyRequestDtoBase);
+            targetDto = instanceCurrency.findCurrencyByCode(currencyRequestDtoTarget);
         } catch (DaoException e) {
             throw new NotFoundException(e.getMessage());
         }
 
         try {
-            instanceExchangeRate.updateRate(baseDto.id(), targetDto.id(), amount);
+            ExchangeRateDto exchangeRateDto = new ExchangeRateRequestDto(baseDto, targetDto, amount);
+            instanceExchangeRate.updateRate(exchangeRateDto);
         } catch (DaoException e) {
-            log.error("Failed to process update rate {}", instanceExchangeRate);
             throw new NotFoundException(e.getMessage());
         }
     }

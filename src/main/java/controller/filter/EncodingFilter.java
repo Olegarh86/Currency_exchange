@@ -7,12 +7,11 @@ import java.io.IOException;
 
 @Slf4j
 public class EncodingFilter implements Filter {
+    private static final String TYPE = "application/json;charset=UTF-8";
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        log.debug("EncodingFilter enter");
-        servletResponse.setContentType("application/json;charset=UTF-8");
+        servletResponse.setContentType(TYPE);
         filterChain.doFilter(servletRequest, servletResponse);
-        log.debug("EncodingFilter exit");
     }
 }
