@@ -9,18 +9,15 @@ import model.ExchangeRate;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import java.math.BigDecimal;
-
 @Mapper
 public interface CurrencyMapper {
     CurrencyMapper INSTANCE = Mappers.getMapper(CurrencyMapper.class);
 
-//    @Mapping(target = "id", ignore = true)
-    Currency convertCurrencyDtoToCurrency(CurrencyDto currencyDto);
+    Currency dtoToCurrency(CurrencyDto currencyDto);
 
-    CurrencyResponseDto convertCurrencyToDto(Currency currency);
+    CurrencyResponseDto currencyToDto(Currency currency);
 
-    ExchangeRateResponseDto convertExchangeRateToExchangeRateDto(ExchangeRate exchangeRate);
+    ExchangeRateResponseDto exchangeRateToDto(ExchangeRate exchangeRate);
 
-    ExchangeRate convertExchangeRateDtoToExchangeRate(ExchangeRateDto exchangeRateDto);
+    ExchangeRate dtoToExchangeRate(ExchangeRateDto exchangeRateDto);
 }

@@ -27,7 +27,6 @@ public class ExceptionHandlerFilter implements Filter {
 
     private void writeErrorResponse(HttpServletResponse res, int statusError, Exception e) throws IOException {
         log.error(e.getMessage());
-        res.reset();
         res.setStatus(statusError);
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(res.getWriter(), e);

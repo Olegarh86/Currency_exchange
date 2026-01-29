@@ -3,7 +3,6 @@ package controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dao.CurrencyDao;
-//import dto.CurrenciesRequestDto;
 import dto.CurrencyDto;
 import dto.CurrencyRequestDto;
 import exception.AlreadyExistException;
@@ -27,7 +26,7 @@ public class CurrenciesServlet extends HttpServlet {
     private static final String CODE_PARAMETER = "code";
     private static final String SIGN_PARAMETER = "sign";
     private static final String INSTANCE_CURRENCY = "instanceCurrency";
-    private static final String CREATE_SUCCESSFUL = "Currency create successful: {}";
+    private static final String CREATE_SUCCESSFUL = "New currency create successful: {}";
     private CurrencyDao instanceCurrency;
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 

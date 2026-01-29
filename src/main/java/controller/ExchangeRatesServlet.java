@@ -19,7 +19,7 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static util.Validator.validateInputParameters;
+import static util.Validator.*;
 
 @Slf4j
 public class ExchangeRatesServlet extends HttpServlet {
@@ -73,11 +73,12 @@ public class ExchangeRatesServlet extends HttpServlet {
         } catch (DaoException e) {
             throw new NotFoundException(e.getMessage());
         }
-        instanceExchangeRate.validateRatesExistence(currencyRequestDtoBase, currencyRequestDtoTarget);
+        checkingForInsertion(instanceExchangeRate, currencyRequestDtoBase, currencyRequestDtoTarget);
         ExchangeRateDto responseDto;
 
         try {
-            instanceExchangeRate.save(new ExchangeRateRequestDto(baseCurrency, targetCurrency, rate));
+            ExchangeRateDto exchangeRateRequestDto = new ExchangeRateRequestDto(baseCurrency, targetCurrency, rate);
+            instanceExchangeRate.save(exchangeRateRequestDto);
             responseDto = instanceExchangeRate.findExchangeRate(currencyRequestDtoBase, currencyRequestDtoTarget);
             log.info(SAVED_SUCCESSFULLY, responseDto);
         } catch (DaoException e) {

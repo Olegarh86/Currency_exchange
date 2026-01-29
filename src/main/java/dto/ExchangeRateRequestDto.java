@@ -2,8 +2,8 @@ package dto;
 
 import java.math.BigDecimal;
 
-public record ExchangeRateRequestDto (CurrencyDto baseCurrency, CurrencyDto targetCurrency,
-                                      BigDecimal rate) implements ExchangeRateDto {
+public record ExchangeRateRequestDto(CurrencyDto baseCurrency, CurrencyDto targetCurrency,
+                                     BigDecimal rate) implements ExchangeRateDto {
 
     @Override
     public Integer getId() {

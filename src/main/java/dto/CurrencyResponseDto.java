@@ -16,9 +16,4 @@ public record CurrencyResponseDto(Integer id, String name, String code, String s
     public String getCode() {
         return code;
     }
-
-    @Override
-    public String getSign() {
-        return sign;
-    }
 }

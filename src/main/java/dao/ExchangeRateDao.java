@@ -1,7 +1,6 @@
 package dao;
 
 import dto.*;
-import exception.AlreadyExistException;
 import exception.DaoException;
 import exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +14,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import static util.Validator.selfCheck;
 
 @Slf4j
 public class ExchangeRateDao {
@@ -34,10 +31,7 @@ public class ExchangeRateDao {
     private static final String EXCHANGE_RATE_NOT_UPDATED = "Exchange rate not updates: ";
     private static final String EXCHANGE_RATES_NOT_FOUND = "Exchange rates not found: ";
     private static final String THERE_IS_NO_SUCH_COURSE = "There is no such course";
-    private static final String EXIST_RATE = "Already exist rate ";
-    private static final String EXIST_REVERSE_RATE = "Already exist reverse rate ";
-    private static final String EXIST_CROSS_RATE = "There is already a cross exchange rate through the ";
-    private static final CurrencyDto USD_DTO = new CurrencyRequestDto("USD");
+
     private final DataSource dataSource;
     private static final String INSERT_SQL = """
             INSERT INTO exchange_rate (base_currency_id, target_currency_id, rate)
@@ -79,10 +73,10 @@ public class ExchangeRateDao {
     }
 
     public void updateRate(ExchangeRateDto exchangeRateDto) {
-        ExchangeRate exchangeRate = CurrencyMapper.INSTANCE.convertExchangeRateDtoToExchangeRate(exchangeRateDto);
-        BigDecimal rate = exchangeRate.getRate();
-        int baseId = exchangeRate.getBaseCurrency().getId();
-        int targetId = exchangeRate.getTargetCurrency().getId();
+        ExchangeRate exchangeRate = CurrencyMapper.INSTANCE.dtoToExchangeRate(exchangeRateDto);
+        BigDecimal rate = exchangeRate.rate();
+        int baseId = exchangeRate.baseCurrency().id();
+        int targetId = exchangeRate.targetCurrency().id();
 
         try (PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(UPDATE_RATE_SQL)) {
             preparedStatement.setBigDecimal(1, rate);
@@ -101,7 +95,7 @@ public class ExchangeRateDao {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 ExchangeRate exchangeRate = buildExchangeRate(resultSet);
-                ExchangeRateDto exchangeRateDto = CurrencyMapper.INSTANCE.convertExchangeRateToExchangeRateDto(exchangeRate);
+                ExchangeRateDto exchangeRateDto = CurrencyMapper.INSTANCE.exchangeRateToDto(exchangeRate);
                 allRatesDto.add(exchangeRateDto);
             }
             return allRatesDto;
@@ -111,42 +105,25 @@ public class ExchangeRateDao {
     }
 
     public ExchangeRateDto findExchangeRate(CurrencyDto currencyDtoBase, CurrencyDto currencyDtoTarget) {
-        Currency baseCurrency = CurrencyMapper.INSTANCE.convertCurrencyDtoToCurrency(currencyDtoBase);
-        Currency targetCurrency = CurrencyMapper.INSTANCE.convertCurrencyDtoToCurrency(currencyDtoTarget);
-        String baseCode = baseCurrency.getCode();
-        String targetCode = targetCurrency.getCode();
+        Currency baseCurrency = CurrencyMapper.INSTANCE.dtoToCurrency(currencyDtoBase);
+        Currency targetCurrency = CurrencyMapper.INSTANCE.dtoToCurrency(currencyDtoTarget);
+        String baseCode = baseCurrency.code();
+        String targetCode = targetCurrency.code();
 
         try (PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(FIND_EXCHANGE_RATE_BY_CODES_SQL)) {
             preparedStatement.setString(1, baseCode);
             preparedStatement.setString(2, targetCode);
             ResultSet resultSet = preparedStatement.executeQuery();
-
             if (resultSet.next()) {
                 ExchangeRate exchangeRate = buildExchangeRate(resultSet);
-                return CurrencyMapper.INSTANCE.convertExchangeRateToExchangeRateDto(exchangeRate);
+                return CurrencyMapper.INSTANCE.exchangeRateToDto(exchangeRate);
             }
-            throw new NotFoundException(EXCHANGE_RATES_NOT_FOUND + currencyDtoBase + currencyDtoTarget);
+            throw new NotFoundException(EXCHANGE_RATES_NOT_FOUND);
         } catch (SQLException | NoSuchElementException e) {
-            throw new DaoException(THERE_IS_NO_SUCH_COURSE + e.getMessage());
+            throw new DaoException(THERE_IS_NO_SUCH_COURSE + currencyDtoBase + currencyDtoTarget + e.getMessage());
         }
     }
 
-    public void validateRatesExistence(CurrencyDto currencyDtoBase,
-                                       CurrencyDto currencyDtoTarget) {
-        selfCheck(currencyDtoBase.getCode(), currencyDtoTarget.getCode());
-
-        if (rateIsExist(currencyDtoBase, currencyDtoTarget)) {
-            throw new AlreadyExistException(EXIST_RATE + currencyDtoBase.getCode() + " " + currencyDtoTarget.getCode());
-        }
-
-        if (rateIsExist(currencyDtoTarget, currencyDtoBase)) {
-            throw new AlreadyExistException(EXIST_REVERSE_RATE + currencyDtoTarget + currencyDtoBase);
-        }
-
-        if (rateIsExist(USD_DTO, currencyDtoBase) && rateIsExist(USD_DTO, currencyDtoTarget)) {
-            throw new AlreadyExistException(EXIST_CROSS_RATE + USD_DTO);
-        }
-    }
 
     public boolean rateIsExist(CurrencyDto baseCurrencyDto, CurrencyDto targetCurrencyDto) {
         try {
@@ -159,16 +136,19 @@ public class ExchangeRateDao {
 
     private static ExchangeRate buildExchangeRate(ResultSet resultSet) throws SQLException {
         int id = resultSet.getInt(ID);
+
         Currency baseCurrencyResult = new Currency(
                 resultSet.getInt(BASE_ID),
                 resultSet.getString(BASE_FULL_NAME),
                 resultSet.getString(BASE_CODE),
                 resultSet.getString(BASE_SIGN));
+
         Currency targetCurrencyResult = new Currency(
                 resultSet.getInt(TARGET_ID),
                 resultSet.getString(TARGET_FULL_NAME),
                 resultSet.getString(TARGET_CODE),
                 resultSet.getString(TARGET_SIGN));
+
         BigDecimal rate = resultSet.getBigDecimal(RATE);
 
         return new ExchangeRate(id, baseCurrencyResult, targetCurrencyResult, rate);

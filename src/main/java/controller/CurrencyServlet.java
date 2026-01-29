@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import dao.CurrencyDao;
 import dto.CurrencyDto;
 import dto.CurrencyRequestDto;
-import exception.BadRequestException;
 import exception.DaoException;
 import exception.NotFoundException;
 import jakarta.servlet.ServletContext;
@@ -22,6 +21,7 @@ import static util.Validator.validateCode;
 @Slf4j
 public class CurrencyServlet extends HttpServlet {
     private static final String INSTANCE_CURRENCY = "instanceCurrency";
+    private static final char SEPARATOR = '/';
     private CurrencyDao instanceCurrency;
     private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
@@ -50,7 +50,7 @@ public class CurrencyServlet extends HttpServlet {
 
     private static String getCode(HttpServletRequest request) {
         String code = request.getRequestURI();
-        code = code.substring(code.lastIndexOf('/') + 1).toUpperCase();
+        code = code.substring(code.lastIndexOf(SEPARATOR) + 1).toUpperCase();
         return code;
     }
 }

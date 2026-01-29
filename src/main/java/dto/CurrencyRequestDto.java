@@ -21,9 +21,4 @@ public record CurrencyRequestDto(String name, String code, String sign) implemen
     public String getCode() {
         return code;
     }
-
-    @Override
-    public String getSign() {
-        return sign;
-    }
 }
