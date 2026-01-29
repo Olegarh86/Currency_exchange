@@ -23,7 +23,7 @@ public class Exchange {
         this.exchangeRateDao = exchangeRateDao;
     }
 
-    public ExchangeDto convert(CurrencyDto currencyDtoBase, CurrencyDto currencyDtoTarget, BigDecimal amount) {
+    public Dto convert(CurrencyDto currencyDtoBase, CurrencyDto currencyDtoTarget, BigDecimal amount) {
         BigDecimal rate;
         ExchangeRateDto exchangeRateDto;
         ExchangeRateDto exchangeRateFrom;

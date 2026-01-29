@@ -88,8 +88,8 @@ public class ExchangeRateDao {
         }
     }
 
-    public List<ExchangeRateDto> findAll() {
-        List<ExchangeRateDto> allRatesDto = new ArrayList<>();
+    public List<Dto> findAll() {
+        List<Dto> allRatesDto = new ArrayList<>();
 
         try (PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(FIND_ALL_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();

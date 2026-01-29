@@ -1,6 +1,7 @@
 package dao;
 
 import dto.CurrencyDto;
+import dto.Dto;
 import exception.DaoException;
 import exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +50,8 @@ public class CurrencyDao {
         }
     }
 
-    public List<CurrencyDto> findAll() {
-        List<CurrencyDto> currencies = new ArrayList<>();
+    public List<Dto> findAll() {
+        List<Dto> currencies = new ArrayList<>();
 
         try (PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(FIND_ALL_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();

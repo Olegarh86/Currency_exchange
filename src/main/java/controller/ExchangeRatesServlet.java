@@ -42,7 +42,7 @@ public class ExchangeRatesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        List<ExchangeRateDto> result;
+        List<Dto> result;
         try {
             result = instanceExchangeRate.findAll();
         } catch (DaoException e) {
@@ -74,19 +74,19 @@ public class ExchangeRatesServlet extends HttpServlet {
             throw new NotFoundException(e.getMessage());
         }
         checkingForInsertion(instanceExchangeRate, currencyRequestDtoBase, currencyRequestDtoTarget);
-        ExchangeRateDto responseDto;
+        Dto result;
 
         try {
             ExchangeRateDto exchangeRateRequestDto = new ExchangeRateRequestDto(baseCurrency, targetCurrency, rate);
             instanceExchangeRate.save(exchangeRateRequestDto);
-            responseDto = instanceExchangeRate.findExchangeRate(currencyRequestDtoBase, currencyRequestDtoTarget);
-            log.info(SAVED_SUCCESSFULLY, responseDto);
+            result = instanceExchangeRate.findExchangeRate(currencyRequestDtoBase, currencyRequestDtoTarget);
+            log.info(SAVED_SUCCESSFULLY, result);
         } catch (DaoException e) {
             throw new AlreadyExistException(e.getMessage());
         }
         PrintWriter out = response.getWriter();
         response.setStatus(HttpServletResponse.SC_CREATED);
-        mapper.writeValue(out, responseDto);
+        mapper.writeValue(out, result);
     }
 }
 

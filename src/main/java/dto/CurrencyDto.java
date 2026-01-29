@@ -1,6 +1,6 @@
 package dto;
 
-public interface CurrencyDto {
+public interface CurrencyDto extends Dto {
     Integer getId();
 
     String getName();

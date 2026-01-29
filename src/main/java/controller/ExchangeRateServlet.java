@@ -49,7 +49,7 @@ public class ExchangeRateServlet extends HttpServlet {
 
         CurrencyDto currencyDtoBase = new CurrencyRequestDto(baseCode);
         CurrencyDto currencyDtoTarget = new CurrencyRequestDto(targetCode);
-        ExchangeRateDto result;
+        Dto result;
         try {
             result = instanceExchangeRate.findExchangeRate(currencyDtoBase, currencyDtoTarget);
         } catch (DaoException e) {
@@ -70,7 +70,7 @@ public class ExchangeRateServlet extends HttpServlet {
         validateInputParameters(baseCode, targetCode, rate);
         BigDecimal newRate = new BigDecimal(rate);
         update(baseCode, targetCode, newRate);
-        ExchangeRateDto result;
+        Dto result;
         CurrencyDto currencyDtoBase = new CurrencyRequestDto(baseCode);
         CurrencyDto currencyDtoTarget = new CurrencyRequestDto(targetCode);
         try {

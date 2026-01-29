@@ -6,6 +6,7 @@ import dao.CurrencyDao;
 import dao.ExchangeRateDao;
 import dto.CurrencyDto;
 import dto.CurrencyRequestDto;
+import dto.Dto;
 import dto.ExchangeDto;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServlet;
@@ -50,7 +51,7 @@ public class ExchangeServlet extends HttpServlet {
         Exchange exchange = new Exchange(instanceCurrency, instanceExchangeRate);
         CurrencyDto currencyDtoBase = new CurrencyRequestDto(baseCode);
         CurrencyDto currencyDtoTarget = new CurrencyRequestDto(targetCode);
-        ExchangeDto result = exchange.convert(currencyDtoBase, currencyDtoTarget, amount);
+        Dto result = exchange.convert(currencyDtoBase, currencyDtoTarget, amount);
         log.info(DONE_RESULT_IS, result);
         PrintWriter out = response.getWriter();
         mapper.writeValue(out, result);

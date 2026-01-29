@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import dao.CurrencyDao;
 import dto.CurrencyDto;
 import dto.CurrencyRequestDto;
+import dto.Dto;
 import exception.AlreadyExistException;
 import exception.DaoException;
 import exception.NotFoundException;
@@ -38,7 +39,7 @@ public class CurrenciesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        List<CurrencyDto> result;
+        List<Dto> result;
         try {
             result = instanceCurrency.findAll();
         } catch (DaoException e) {
@@ -57,7 +58,7 @@ public class CurrenciesServlet extends HttpServlet {
 
         validateCurrency(code, name);
         CurrencyDto currencyRequestDto = new CurrencyRequestDto(name, code, sign);
-        CurrencyDto result;
+        Dto result;
         try {
             instanceCurrency.save(currencyRequestDto);
             result = instanceCurrency.findCurrencyByCode(currencyRequestDto);
