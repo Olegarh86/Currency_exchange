@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.Exchange;
 import lombok.extern.slf4j.Slf4j;
+import service.Service;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -48,7 +49,8 @@ public class ExchangeServlet extends HttpServlet {
 
         validateInputParameters(baseCode, targetCode, amountString);
         BigDecimal amount = new BigDecimal(amountString);
-        Exchange exchange = new Exchange(instanceCurrency, instanceExchangeRate);
+
+        Service exchange = new Exchange(instanceCurrency, instanceExchangeRate);
         CurrencyDto currencyDtoBase = new CurrencyRequestDto(baseCode);
         CurrencyDto currencyDtoTarget = new CurrencyRequestDto(targetCode);
         Dto result = exchange.convert(currencyDtoBase, currencyDtoTarget, amount);

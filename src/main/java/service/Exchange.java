@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Slf4j
-public class Exchange {
+public class Exchange implements Service {
     private static final CurrencyDto USD_DTO = new CurrencyRequestDto("USD");
     private static final String RATE_NOT_FOUND = "Exchange rate not found. Add exchange rate and try again.";
     private static final int SCALE_RESULT = 2;
@@ -23,6 +23,7 @@ public class Exchange {
         this.exchangeRateDao = exchangeRateDao;
     }
 
+    @Override
     public Dto convert(CurrencyDto currencyDtoBase, CurrencyDto currencyDtoTarget, BigDecimal amount) {
         BigDecimal rate;
         ExchangeRateDto exchangeRateDto;

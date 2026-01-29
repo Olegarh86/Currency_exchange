@@ -3,10 +3,6 @@ package dto;
 
 public record CurrencyRequestDto(String name, String code, String sign) implements CurrencyDto {
 
-    public CurrencyRequestDto(String code) {
-        this("", code, "");
-    }
-
     @Override
     public Integer getId() {
         return 0;
@@ -20,5 +16,9 @@ public record CurrencyRequestDto(String name, String code, String sign) implemen
     @Override
     public String getCode() {
         return code;
+    }
+
+    public CurrencyRequestDto(String code) {
+        this("", code, "");
     }
 }
