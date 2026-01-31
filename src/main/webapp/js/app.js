@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    const host ="http://exchanger-app.ru" /*"http://localhost:8080"*//*"http://171.22.174.45:8080"*/
+    const host ="http://exchanger-app.ru" /*"http://localhost:8080"*//*"http://exchanger-app.ru"*/
 
     // Fetch the list of currencies and populate the select element
     function requestCurrencies() {

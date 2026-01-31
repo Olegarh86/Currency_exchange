@@ -18,7 +18,8 @@ public final class Validator {
                                                       "than 0 and have no more than 6 decimal places.";
     private static final String CODE_IS_EMPTY = "code is empty ";
     private static final String NAME_IS_EMPTY = "name is empty ";
-    private static final String NOT_COMPLY_WITH_ISO_4217 = " code does not comply with ISO 4217";
+    private static final String NOT_COMPLY_WITH_ISO_4217 = " code does not comply with ISO 4217. See more: " +
+                                                           "https://www.iso.org/ru/iso-4217-currency-codes.html";
     private static final String INVALID_NAME = "The currency name is too long. 100 characters are. Name: " +
                                                "allowed in the currency name";
     private static final String MESSAGE_ITSELF = "Exchange rate between the currency and itself is 1";

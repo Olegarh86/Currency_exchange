@@ -7,7 +7,6 @@ import dao.ExchangeRateDao;
 import dto.CurrencyDto;
 import dto.CurrencyRequestDto;
 import dto.Dto;
-import dto.ExchangeDto;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

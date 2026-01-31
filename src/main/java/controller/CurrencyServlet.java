@@ -50,7 +50,7 @@ public class CurrencyServlet extends HttpServlet {
     }
 
     private static String getCode(HttpServletRequest request) {
-        String code = request.getRequestURI();
+        String code = request.getRequestURI(); //TODO getQueryString()
         code = code.substring(code.lastIndexOf(SEPARATOR) + 1).toUpperCase();
         return code;
     }
