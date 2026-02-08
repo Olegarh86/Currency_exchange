@@ -2,8 +2,8 @@ package AppContextListener;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import dao.CurrencyDao;
-import dao.ExchangeRateDao;
+import dao.JdbcCurrencyDao;
+import dao.JdbcExchangeRateDao;
 import exception.ConnectionException;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -44,8 +44,8 @@ public class AppContextListener implements ServletContextListener {
             throw new ConnectionException(FAILED_TO_PROCESS_INIT_CONTEXT + e.getMessage());
         }
 
-        CurrencyDao instanceCurrency = new CurrencyDao(hikariDataSource);
-        ExchangeRateDao instanceExchangeRate = new ExchangeRateDao(hikariDataSource);
+        JdbcCurrencyDao instanceCurrency = new JdbcCurrencyDao(hikariDataSource);
+        JdbcExchangeRateDao instanceExchangeRate = new JdbcExchangeRateDao(hikariDataSource);
 
         event.getServletContext().setAttribute(INSTANCE_CURRENCY, instanceCurrency);
         event.getServletContext().setAttribute(INSTANCE_EXCHANGE_RATE, instanceExchangeRate);

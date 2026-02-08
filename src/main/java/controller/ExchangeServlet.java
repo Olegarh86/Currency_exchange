@@ -1,12 +1,10 @@
 package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import dao.CurrencyDao;
-import dao.ExchangeRateDao;
-import dto.CurrencyDto;
-import dto.CurrencyRequestDto;
-import dto.Dto;
+import dao.JdbcCurrencyDao;
+import dao.JdbcExchangeRateDao;
+import dto.ExchangeDto;
+import exception.NotFoundException;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import service.Service;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.math.BigDecimal;
 
 import static util.Validator.validateInputParameters;
@@ -29,15 +26,16 @@ public class ExchangeServlet extends HttpServlet {
     private static final String TARGET_CODE_PARAMETER = "to";
     private static final String AMOUNT_PARAMETER = "amount";
     private static final String DONE_RESULT_IS = "Exchange is done, result is: {}";
-    private CurrencyDao instanceCurrency;
-    private ExchangeRateDao instanceExchangeRate;
-    private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+    private static final String RATE_NOT_FOUND = "Exchange rate not found. Add exchange rate and try again.";
+    private JdbcCurrencyDao instanceCurrency;
+    private JdbcExchangeRateDao instanceExchangeRate;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public void init() {
         ServletContext servletContext = getServletContext();
-        this.instanceCurrency = (CurrencyDao) servletContext.getAttribute(INSTANCE_CURRENCY);
-        this.instanceExchangeRate = (ExchangeRateDao) servletContext.getAttribute(INSTANCE_EXCHANGE_RATE);
+        this.instanceCurrency = (JdbcCurrencyDao) servletContext.getAttribute(INSTANCE_CURRENCY);
+        this.instanceExchangeRate = (JdbcExchangeRateDao) servletContext.getAttribute(INSTANCE_EXCHANGE_RATE);
     }
 
     @Override
@@ -50,11 +48,9 @@ public class ExchangeServlet extends HttpServlet {
         BigDecimal amount = new BigDecimal(amountString);
 
         Service exchange = new Exchange(instanceCurrency, instanceExchangeRate);
-        CurrencyDto currencyDtoBase = new CurrencyRequestDto(baseCode);
-        CurrencyDto currencyDtoTarget = new CurrencyRequestDto(targetCode);
-        Dto result = exchange.convert(currencyDtoBase, currencyDtoTarget, amount);
+        ExchangeDto result = exchange.convert(baseCode, targetCode, amount).
+                orElseThrow(() -> new NotFoundException(RATE_NOT_FOUND));
         log.info(DONE_RESULT_IS, result);
-        PrintWriter out = response.getWriter();
-        mapper.writeValue(out, result);
+        mapper.writeValue(response.getWriter(), result);
     }
 }

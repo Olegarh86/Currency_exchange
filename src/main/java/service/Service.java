@@ -1,10 +1,10 @@
 package service;
 
-import dto.CurrencyDto;
-import dto.Dto;
+import dto.ExchangeDto;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 public interface Service {
-    Dto convert(CurrencyDto currencyDtoBase, CurrencyDto currencyDtoTarget, BigDecimal amount);
+    Optional<ExchangeDto> convert(String baseCode, String targetCode, BigDecimal amount);
 }

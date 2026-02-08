@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="75603c42-f08e-4765-bdd7-c4d8f5ed7110" name="171.22.174.45:51821" url="http://exchanger-app.ru/">
+        <fileTransfer accessType="SFTP" host="171.22.174.45" port="51821" sshConfigId="f0c9a6fc-7ad3-4d5d-8a5e-811a97da6375" sshConfig="root@171.22.174.45:51821 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

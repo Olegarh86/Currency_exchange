@@ -1,0 +1,185 @@
+
+### Change 100 USD to RUB, 200
+GET http://exchanger-app.ru/exchange?from=USD&to=RUB&amount=100
+Accept: application/json
+
+<> 2026-02-07T201752.200.json
+<> 2026-02-07T195836.200.json
+
+### Update rate with non-existent in data base currency CNY, 404
+PATCH http://exchanger-app.ru/exchangeRate/USDCNY
+Content-Type: application/x-www-form-urlencoded
+
+rate = 75
+
+<> 2026-02-07T201749.404.json
+<> 2026-02-07T195553.404.json
+
+### Update rate USD/RUB without rate, 400
+PATCH http://exchanger-app.ru/exchangeRate/USDRUB
+Content-Type: application/x-www-form-urlencoded
+
+<> 2026-02-07T201746.400.json
+<> 2026-02-07T195342.400.json
+
+
+
+### Update rate USD/RUB, 200
+PATCH http://exchanger-app.ru/exchangeRate/USDRUB
+Content-Type: application/x-www-form-urlencoded
+
+rate = 75
+
+<> 2026-02-07T201744.200.json
+<> 2026-02-07T195254.200.json
+
+### Add new exchange rate USD/AFN, 201
+POST http://exchanger-app.ru/exchangeRates
+Content-Type: application/x-www-form-urlencoded
+
+baseCurrencyCode = USD &
+targetCurrencyCode = AFN &
+rate = 0.73
+
+<> 2026-02-07T201741.201.json
+<> 2026-02-07T195141.201.json
+<> 2026-02-07T195046.404.json
+
+### Add exchange rate without rate, 400
+POST http://exchanger-app.ru/exchangeRates
+Content-Type: application/x-www-form-urlencoded
+
+baseCurrencyCode = USD &
+targetCurrencyCode = CNY &
+rate =
+
+<> 2026-02-07T201738.400.json
+<> 2026-02-07T194718.400.json
+
+### Add exchange rate with on-existent currency CNY, 404
+POST http://exchanger-app.ru/exchangeRates
+Content-Type: application/x-www-form-urlencoded
+
+baseCurrencyCode = USD &
+targetCurrencyCode = CNY &
+rate = 50
+
+<> 2026-02-07T201735.404.json
+<> 2026-02-07T194508.404.json
+<> 2026-02-07T194432.400.json
+
+### Ad exchange rate, xchange rate already exist, 409
+POST http://exchanger-app.ru/exchangeRates
+Content-Type: application/x-www-form-urlencoded
+
+baseCurrencyCode = USD &
+targetCurrencyCode = EUR &
+rate = 50
+
+<> 2026-02-07T201732.409.json
+<> 2026-02-07T194201.409.json
+<> 2026-02-07T193937.400.html
+
+### Exchange rate not found. 404
+GET http://exchanger-app.ru/exchangeRate/USDPUK
+Accept: application/json
+
+<> 2026-02-07T201729.404.json
+<> 2026-02-07T193753.404.json
+
+### Non-existent codes in path, 400
+GET http://exchanger-app.ru/exchangeRate/
+Accept: application/json
+
+<> 2026-02-07T201726.400.json
+<> 2026-02-07T193653.400.json
+<> 2026-02-07T192759.500.json
+<> 2026-02-07T192554.500.json
+
+### Get rate USD/RUB, 200
+GET http://exchanger-app.ru/exchangeRate/USDRUB
+Accept: application/json
+
+<> 2026-02-07T201724.200.json
+<> 2026-02-07T192356.200.json
+
+### Get all currencies, 200
+GET http://exchanger-app.ru/exchangeRates
+Accept: application/json
+
+<> 2026-02-07T201722.200.json
+<> 2026-02-07T192323.200.json
+<> 2026-02-07T192254.200.json
+
+### Add an existing currency USD, 409
+POST http://exchanger-app.ru/currencies
+Content-Type: application/x-www-form-urlencoded
+
+name = US Dollar &
+code = USD &
+sign = $
+
+<> 2026-02-07T201719.409.json
+<> 2026-02-07T192216.409.json
+<> 2026-02-07T192130.409.json
+<> 2026-02-07T191931.409.json
+<> 2026-02-07T191800.409.json
+<> 2026-02-07T191724.500.json
+<> 2026-02-07T191254.500.json
+<> 2026-02-07T191229.500.json
+<> 2026-02-07T191213.201.json
+
+
+### Add currency Yuan Renminbi without code, 400
+POST http://exchanger-app.ru/currencies
+Content-Type: application/x-www-form-urlencoded
+
+name = Yuan Renminbi &
+code =  &
+sign = ¥
+
+<> 2026-02-07T201715.400.json
+<> 2026-02-07T191123.400.json
+
+### Add currency AFN, 201
+POST http://exchanger-app.ru/currencies
+Content-Type: application/x-www-form-urlencoded
+
+name = Afghani &
+code = AFN &
+sign = ؋
+
+<> 2026-02-07T201711.201.json
+
+### Get non-existent currency PUK, 404
+GET http://exchanger-app.ru/currency/PUK
+Accept: application/json
+
+<> 2026-02-07T201708.404.json
+
+### Get Currency without code, 400
+GET http://exchanger-app.ru/currency/
+Accept: application/json
+
+<> 2026-02-07T201706.400.json
+<> 2026-02-07T184102.400.json
+<> 2026-02-07T183705.404.json
+
+### Get EUR, 200
+GET http://exchanger-app.ru/currency/EUR
+Accept: application/json
+
+<> 2026-02-07T201700-1.200.json
+<> 2026-02-07T201700.200.json
+
+### Get all Curencies, 200
+GET http://exchanger-app.ru/currencies
+Accept: application/json
+
+<> 2026-02-07T201521.200.json
+
+### HTML, 200
+GET http://exchanger-app.ru/
+Accept: application/json
+
+<> 2026-02-07T201518.200.html

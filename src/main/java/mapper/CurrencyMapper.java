@@ -1,23 +1,31 @@
 package mapper;
 
-import dto.CurrencyDto;
-import dto.CurrencyResponseDto;
-import dto.ExchangeRateDto;
-import dto.ExchangeRateResponseDto;
+import dto.*;
 import model.Currency;
 import model.ExchangeRate;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+
+import java.math.BigDecimal;
 
 @Mapper
 public interface CurrencyMapper {
     CurrencyMapper INSTANCE = Mappers.getMapper(CurrencyMapper.class);
 
-    Currency dtoToCurrency(CurrencyDto currencyDto);
-
     CurrencyResponseDto currencyToDto(Currency currency);
+
+    CurrencyResponseDto requestDtoToResponseDto(Long id, CurrencyRequestDto requestDto);
+
+    Currency dtoToCurrency(CurrencyRequestDto currencyDto);
+
+    @Mapping(target = "id",  ignore = true)
+    ExchangeRate currenciesWithRateToExchangeRate(Currency baseCurrency, Currency targetCurrency, BigDecimal rate);
 
     ExchangeRateResponseDto exchangeRateToDto(ExchangeRate exchangeRate);
 
-    ExchangeRate dtoToExchangeRate(ExchangeRateDto exchangeRateDto);
+    ExceptionDto exceptionToDto(String message);
+
+    ExchangeDto exchangeResultToDto(Currency baseCurrency, Currency targetCurrency,
+                                    BigDecimal rate, BigDecimal amount, BigDecimal convertedAmount);
 }

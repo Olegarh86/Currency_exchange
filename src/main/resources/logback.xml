@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <property name="LOG_DIR" value="/opt/exchanger/logs/" />
-    <!--"C:\Users\Olegarh\logs"-->
+    <property name="LOG_DIR" value="/opt/exchanger/logs" />
     <!--"/opt/exchanger/logs"-->
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">

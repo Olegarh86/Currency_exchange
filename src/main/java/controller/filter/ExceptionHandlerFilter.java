@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import mapper.CurrencyMapper;
 
 import java.io.IOException;
 
@@ -30,9 +31,11 @@ public class ExceptionHandlerFilter extends HttpFilter {
     }
 
     private void writeErrorResponse(HttpServletResponse res, int statusError, Exception e) throws IOException {
-        log.error(e.getMessage());
+        String message = e.getMessage();
+        log.error(message);
         res.setStatus(statusError);
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(res.getWriter(), new ExceptionDto(e.getMessage()));
+        ExceptionDto dto = CurrencyMapper.INSTANCE.exceptionToDto(message);
+        mapper.writeValue(res.getWriter(), dto);
     }
 }

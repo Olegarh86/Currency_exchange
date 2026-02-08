@@ -1,21 +1,17 @@
 package controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import dao.CurrencyDao;
-import dto.CurrencyDto;
-import dto.CurrencyRequestDto;
-import dto.Dto;
-import exception.DaoException;
+import dao.JdbcCurrencyDao;
 import exception.NotFoundException;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import mapper.CurrencyMapper;
+import model.Currency;
 
 import static util.Validator.validateCode;
 
@@ -23,35 +19,25 @@ import static util.Validator.validateCode;
 public class CurrencyServlet extends HttpServlet {
     private static final String INSTANCE_CURRENCY = "instanceCurrency";
     private static final char SEPARATOR = '/';
-    private CurrencyDao instanceCurrency;
-    private final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+    private JdbcCurrencyDao instanceCurrency;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public void init() {
         ServletContext servletContext = getServletContext();
-        this.instanceCurrency = (CurrencyDao) servletContext.getAttribute(INSTANCE_CURRENCY);
+        this.instanceCurrency = (JdbcCurrencyDao) servletContext.getAttribute(INSTANCE_CURRENCY);
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String code = getCode(request);
+        String path = request.getPathInfo();
+        String code = path.substring(path.lastIndexOf(SEPARATOR) + 1).toUpperCase();
 
         validateCode(code);
-        CurrencyDto currencyRequestDto = new CurrencyRequestDto(code);
-        Dto result;
-        try {
-            result = instanceCurrency.findCurrencyByCode(currencyRequestDto);
-        } catch (DaoException e) {
-            throw new NotFoundException(e.getMessage());
-        }
-        PrintWriter out = response.getWriter();
-        response.setStatus(HttpServletResponse.SC_OK);
-        mapper.writeValue(out, result);
-    }
 
-    private static String getCode(HttpServletRequest request) {
-        String code = request.getRequestURI(); //TODO getQueryString()
-        code = code.substring(code.lastIndexOf(SEPARATOR) + 1).toUpperCase();
-        return code;
+        Currency result = instanceCurrency.findByCode(code).orElseThrow(() -> new NotFoundException(code));
+
+        response.setStatus(HttpServletResponse.SC_OK);
+        mapper.writeValue(response.getWriter(), CurrencyMapper.INSTANCE.currencyToDto(result));
     }
 }
