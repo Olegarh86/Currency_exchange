@@ -5,7 +5,7 @@
     <!--"/opt/exchanger/logs"-->
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_DIR}\exchanger.log</file>
+        <file>${LOG_DIR}/exchanger.log</file>
         <append>true</append>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">

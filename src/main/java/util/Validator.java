@@ -11,8 +11,15 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public final class Validator {
-    private static final String BAD_REQUEST_MESSAGE = ": erroneously entered value. Enter a number greater " +
-                                                      "than 0 and have no more than 6 decimal places.";
+    private static final int NAME_MAX_LENGTH = 50;
+    private static final int MAX_SCALE = 6;
+    private static final int CODE_SIGN_LENGTH = 3;
+    private static final BigDecimal LOWER_BOUND_VALUE = BigDecimal.ZERO;
+    private static final BigDecimal MAX_VALUE = new BigDecimal("1.7976931348623157e+308");
+    private static final Set<String> allCodes;
+    private static final String BAD_REQUEST_MESSAGE =
+            ": erroneously entered value. Enter a number between 0 and " + MAX_VALUE + " and have no more than 6 " +
+            "decimal places.";
     private static final String CODE_IS_EMPTY = "code is empty";
     private static final String NAME_IS_EMPTY = "name is empty";
     private static final String NOT_COMPLY_WITH_ISO_4217 = " code does not comply with ISO 4217. See more: " +
@@ -21,11 +28,6 @@ public final class Validator {
                                                "allowed in the currency name";
     private static final String MESSAGE_ITSELF = "Exchange rate between the currency and itself is 1";
     private static final String SYMBOL_TOO_LONG = " sign of currency is too long. Enter 3 symbols maximum";
-    private static final int NAME_MAX_LENGTH = 50;
-    private static final int MAX_SCALE = 6;
-    private static final int CODE_SIGN_LENGTH = 3;
-    private static final BigDecimal LOWER_BOUND_VALUE = BigDecimal.ZERO;
-    private static final Set<String> allCodes;
 
     private Validator() {
     }
@@ -97,7 +99,9 @@ public final class Validator {
             throw new BadRequestException(rate + BAD_REQUEST_MESSAGE);
         }
 
-        if (newRate.compareTo(LOWER_BOUND_VALUE) <= 0 || newRate.scale() > MAX_SCALE) {
+        if (newRate.compareTo(LOWER_BOUND_VALUE) <= 0 ||
+            newRate.scale() > MAX_SCALE ||
+            newRate.compareTo(MAX_VALUE) > 0) {
             throw new BadRequestException(rate + BAD_REQUEST_MESSAGE);
         }
     }
