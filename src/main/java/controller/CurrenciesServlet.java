@@ -5,7 +5,6 @@ import dao.JdbcCurrencyDao;
 import dto.CurrencyRequestDto;
 import dto.CurrencyResponseDto;
 import exception.NotFoundException;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,18 +22,10 @@ public class CurrenciesServlet extends HttpServlet {
     private static final String NAME_PARAMETER = "name";
     private static final String CODE_PARAMETER = "code";
     private static final String SIGN_PARAMETER = "sign";
-    private static final String INSTANCE_CURRENCY = "instanceCurrency";
     private static final String CREATE_SUCCESSFUL = "New currency create successful: {}";
     private static final String NOT_FOUND = "Currencies not found: ";
-
-    private JdbcCurrencyDao instanceCurrency;
+    private final JdbcCurrencyDao instanceCurrency = new JdbcCurrencyDao();
     private final ObjectMapper mapper = new ObjectMapper();
-
-    @Override
-    public void init() {
-        ServletContext servletContext = getServletContext();
-        this.instanceCurrency = (JdbcCurrencyDao) servletContext.getAttribute(INSTANCE_CURRENCY);
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {

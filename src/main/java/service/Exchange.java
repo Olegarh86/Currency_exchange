@@ -4,14 +4,14 @@ import dao.JdbcCurrencyDao;
 import dao.JdbcExchangeRateDao;
 import dto.*;
 import exception.NotFoundException;
+import exception.TooMuchExchangeRates;
 import lombok.extern.slf4j.Slf4j;
-import mapper.CurrencyMapper;
 import model.Currency;
 import model.ExchangeRate;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Optional;
+import java.util.List;
 
 @Slf4j
 public class Exchange implements Service {
@@ -27,97 +27,69 @@ public class Exchange implements Service {
     }
 
     @Override
-    public Optional<ExchangeDto> convert(String baseCode, String targetCode, BigDecimal amount) {
-        Optional<ExchangeRate> mayBeExchangeRate = findExchangeRate(baseCode, targetCode);
-
-        if (mayBeExchangeRate.isPresent()) {
-            Currency baseCurrency = jdbcCurrencyDao.findByCode(baseCode).
-                    orElseThrow(() -> new NotFoundException(baseCode));
-            Currency targetCurrency = jdbcCurrencyDao.findByCode(targetCode).
-                    orElseThrow(() -> new NotFoundException(targetCode));
-            BigDecimal rate = mayBeExchangeRate.get().rate();
-
-            BigDecimal convertedAmount = amount.multiply(rate).setScale(SCALE_RESULT,
-                    RoundingMode.HALF_EVEN);
-            return Optional.of(CurrencyMapper.INSTANCE.exchangeResultToDto(baseCurrency, targetCurrency, rate, amount,
-                    convertedAmount));
-        }
-        return Optional.empty();
-
+    public ExchangeDto convert(String baseCode, String targetCode, BigDecimal amount) {
+        List<ExchangeRate> allExchangeRates = jdbcExchangeRateDao.findAllExchangeRates(baseCode,
+                targetCode).orElseThrow(() -> new NotFoundException(baseCode + targetCode));
+        CurrenciesWithRateDto rateDto = getRate(baseCode, targetCode, allExchangeRates);
+        BigDecimal convertedAmount = amount.multiply(rateDto.rate()).setScale(SCALE_RESULT, RoundingMode.HALF_EVEN);
+        return new ExchangeDto(rateDto.baseCurrency(), rateDto.targetCurrency(), rateDto.rate(), amount, convertedAmount);
     }
 
-    public Optional<ExchangeRate> findExchangeRate(String baseCode, String targetCode) {
-        Optional<ExchangeRate> mayBeExchangeRate = findDirectExchangeRate(baseCode, targetCode);
-
-        if (mayBeExchangeRate.isEmpty()) {
-            mayBeExchangeRate = findReverseExchangeRate(baseCode, targetCode);
+    private static CurrenciesWithRateDto getRate(String baseCode, String targetCode, List<ExchangeRate> allExchangeRates) {
+        BigDecimal rate = null;
+        Currency baseCurrency = null;
+        Currency targetCurrency = null;
+        if (allExchangeRates.size() == 1) {
+            ExchangeRate exchangeRate = allExchangeRates.get(0);
+            if (exchangeRate.baseCurrency().code().equals(baseCode) && exchangeRate.targetCurrency().code().equals(targetCode)) {
+                rate = exchangeRate.rate();
+                baseCurrency = exchangeRate.baseCurrency();
+                targetCurrency = exchangeRate.targetCurrency();
+            }
+            if (exchangeRate.baseCurrency().code().equals(targetCode) && exchangeRate.targetCurrency().code().equals(baseCode)) {
+                rate = BigDecimal.ONE.divide(exchangeRate.rate(), SCALE, RoundingMode.HALF_EVEN);
+                baseCurrency = exchangeRate.targetCurrency();
+                targetCurrency = exchangeRate.baseCurrency();
+            }
+        } else if (allExchangeRates.size() == 2) {
+            ExchangeRate firstExchangeRate;
+            ExchangeRate secondExchangeRate;
+            if (allExchangeRates.get(0).baseCurrency().code().equals(targetCode) ||
+                allExchangeRates.get(0).targetCurrency().code().equals(targetCode)) {
+                firstExchangeRate = allExchangeRates.get(1);
+                secondExchangeRate = allExchangeRates.get(0);
+            } else {
+                firstExchangeRate = allExchangeRates.get(0);
+                secondExchangeRate = allExchangeRates.get(1);
+            }
+            if ((firstExchangeRate.baseCurrency().code().equals(baseCode) && firstExchangeRate.targetCurrency().code().equals(USD)) &&
+                (secondExchangeRate.baseCurrency().code().equals(targetCode) && secondExchangeRate.targetCurrency().code().equals(USD))) {
+                rate = firstExchangeRate.rate().divide(secondExchangeRate.rate(), SCALE, RoundingMode.HALF_EVEN);
+                baseCurrency = firstExchangeRate.baseCurrency();
+                targetCurrency = secondExchangeRate.baseCurrency();
+            }
+            if ((firstExchangeRate.baseCurrency().code().equals(USD) && firstExchangeRate.targetCurrency().code().equals(baseCode)) &&
+                (secondExchangeRate.baseCurrency().code().equals(USD) && secondExchangeRate.targetCurrency().code().equals(targetCode))) {
+                rate = secondExchangeRate.rate().divide(firstExchangeRate.rate(), SCALE, RoundingMode.HALF_EVEN);
+                baseCurrency = firstExchangeRate.targetCurrency();
+                targetCurrency = secondExchangeRate.targetCurrency();
+            }
+            if ((firstExchangeRate.baseCurrency().code().equals(baseCode) && firstExchangeRate.targetCurrency().code().equals(USD)) &&
+                (secondExchangeRate.baseCurrency().code().equals(USD) && secondExchangeRate.targetCurrency().code().equals(targetCode))) {
+                rate = firstExchangeRate.rate().multiply(secondExchangeRate.rate()).setScale(SCALE, RoundingMode.HALF_EVEN);
+                baseCurrency = firstExchangeRate.baseCurrency();
+                targetCurrency = secondExchangeRate.targetCurrency();
+            }
+            if ((firstExchangeRate.baseCurrency().code().equals(USD) && firstExchangeRate.targetCurrency().code().equals(baseCode)) &&
+                (secondExchangeRate.baseCurrency().code().equals(targetCode) && secondExchangeRate.targetCurrency().code().equals(USD))) {
+                rate = BigDecimal.ONE.divide(firstExchangeRate.rate().multiply(secondExchangeRate.rate())).setScale(SCALE,
+                        RoundingMode.HALF_EVEN);
+                baseCurrency = firstExchangeRate.targetCurrency();
+                targetCurrency = secondExchangeRate.baseCurrency();
+            }
+        } else {
+            throw new TooMuchExchangeRates(baseCode + targetCode);
         }
-
-        if (mayBeExchangeRate.isEmpty()) {
-            mayBeExchangeRate = findExchangeRateThroughDollar(baseCode, targetCode);
-        }
-        return mayBeExchangeRate;
-    }
-
-    private Optional<ExchangeRate> findDirectExchangeRate(String baseCode, String targetCode) {
-        return jdbcExchangeRateDao.findByCodes(baseCode, targetCode);
-    }
-
-    private Optional<ExchangeRate> findReverseExchangeRate(String baseCode, String targetCode) {
-        Optional<ExchangeRate> mayBeExchangeRate = jdbcExchangeRateDao.findByCodes(targetCode, baseCode);
-
-        if (mayBeExchangeRate.isPresent()) {
-            ExchangeRate exchangeRate = mayBeExchangeRate.get();
-            BigDecimal rate = exchangeRate.rate();
-            BigDecimal rateResult = BigDecimal.ONE.divide(rate, SCALE, RoundingMode.HALF_EVEN);
-
-            return Optional.of(
-                    CurrencyMapper.INSTANCE.currenciesWithRateToExchangeRate(
-                            exchangeRate.baseCurrency(),
-                            exchangeRate.targetCurrency(),
-                            rateResult));
-        }
-        return Optional.empty();
-    }
-
-    private Optional<ExchangeRate> findExchangeRateThroughDollar(String baseCode, String targetCode) {
-        BigDecimal rate;
-        Optional<ExchangeRate> mayBeBaseUsd = findDirectExchangeRate(baseCode, USD);
-        Optional<ExchangeRate> mayBeTargetUsd = findDirectExchangeRate(targetCode, USD);
-        Optional<ExchangeRate> mayBeUsdBase = findReverseExchangeRate(baseCode, USD);
-        Optional<ExchangeRate> mayBeUsdTarget = findReverseExchangeRate(targetCode, USD);
-
-        if (mayBeBaseUsd.isPresent() && mayBeTargetUsd.isPresent()) {
-            rate = mayBeTargetUsd.get().rate().divide(mayBeBaseUsd.get().rate(), SCALE, RoundingMode.HALF_EVEN);
-            return Optional.of(CurrencyMapper.INSTANCE.currenciesWithRateToExchangeRate(
-                    mayBeBaseUsd.get().baseCurrency(),
-                    mayBeTargetUsd.get().baseCurrency(),
-                    rate));
-        }
-
-        if (mayBeUsdBase.isPresent() && mayBeUsdTarget.isPresent()) {
-            rate = mayBeUsdBase.get().rate().divide(mayBeUsdTarget.get().rate(), SCALE, RoundingMode.HALF_EVEN);
-            return Optional.of(CurrencyMapper.INSTANCE.currenciesWithRateToExchangeRate(
-                    mayBeUsdBase.get().targetCurrency(),
-                    mayBeUsdTarget.get().targetCurrency(),
-                    rate));
-        }
-
-        if (mayBeBaseUsd.isPresent() && mayBeUsdTarget.isPresent()) {
-            rate = mayBeUsdTarget.get().rate().divide(mayBeBaseUsd.get().rate(), SCALE, RoundingMode.HALF_EVEN);
-            return Optional.of(CurrencyMapper.INSTANCE.currenciesWithRateToExchangeRate(
-                    mayBeBaseUsd.get().baseCurrency(),
-                    mayBeUsdTarget.get().targetCurrency(),
-                    rate));
-        }
-
-        if (mayBeUsdBase.isPresent() && mayBeTargetUsd.isPresent()) {
-            rate = mayBeTargetUsd.get().rate().divide(mayBeUsdBase.get().rate(), SCALE, RoundingMode.HALF_EVEN);
-            return Optional.of(CurrencyMapper.INSTANCE.currenciesWithRateToExchangeRate(
-                    mayBeUsdBase.get().targetCurrency(),
-                    mayBeTargetUsd.get().baseCurrency(),
-                    rate));
-        }
-        return Optional.empty();
+        return new CurrenciesWithRateDto(baseCurrency, targetCurrency, rate);
     }
 }

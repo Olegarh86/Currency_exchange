@@ -6,7 +6,6 @@ import dao.JdbcExchangeRateDao;
 import dto.*;
 import exception.AlreadyExistException;
 import exception.NotFoundException;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import mapper.CurrencyMapper;
 import model.Currency;
 import model.ExchangeRate;
-import service.Exchange;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -25,8 +23,6 @@ import static util.Validator.*;
 
 @Slf4j
 public class ExchangeRatesServlet extends HttpServlet {
-    private static final String INSTANCE_CURRENCY = "instanceCurrency";
-    private static final String INSTANCE_EXCHANGE_RATE = "instanceExchangeRate";
     private static final String BASE_CODE_PARAMETER = "baseCurrencyCode";
     private static final String TARGET_CODE_PARAMETER = "targetCurrencyCode";
     private static final String RATE_PARAMETER = "rate";
@@ -34,16 +30,9 @@ public class ExchangeRatesServlet extends HttpServlet {
     private static final String SAVED_SUCCESSFULLY = "ExchangeRate saved successfully: {}";
     private static final String NOT_FOUND = "Exchange rates not found";
     private static final String SPLITTER = " - ";
-    private JdbcCurrencyDao instanceCurrency;
-    private JdbcExchangeRateDao instanceExchangeRate;
+    private final JdbcCurrencyDao instanceCurrency = new JdbcCurrencyDao();
+    private final JdbcExchangeRateDao instanceExchangeRate = new JdbcExchangeRateDao();
     private final ObjectMapper mapper = new ObjectMapper();
-
-    @Override
-    public void init() {
-        ServletContext servletContext = getServletContext();
-        this.instanceCurrency = (JdbcCurrencyDao) servletContext.getAttribute(INSTANCE_CURRENCY);
-        this.instanceExchangeRate = (JdbcExchangeRateDao) servletContext.getAttribute(INSTANCE_EXCHANGE_RATE);
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -68,8 +57,7 @@ public class ExchangeRatesServlet extends HttpServlet {
         Currency targetCurrency = instanceCurrency.findByCode(targetCode).
                 orElseThrow(() -> new NotFoundException(targetCode));
 
-        Optional<ExchangeRate> mayBeExchangeRate =
-                new Exchange(instanceCurrency, instanceExchangeRate).findExchangeRate(baseCode, targetCode);
+        Optional<ExchangeRate> mayBeExchangeRate = instanceExchangeRate.findByCodes(baseCode, targetCode);
         if (mayBeExchangeRate.isPresent()) {
             throw new AlreadyExistException(EXCHANGE_RATE + baseCode + SPLITTER + targetCode);
         }

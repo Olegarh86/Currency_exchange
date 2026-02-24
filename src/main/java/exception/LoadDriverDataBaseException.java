@@ -1,7 +1,7 @@
 package exception;
 
-public class LoadDriverDataBase extends RuntimeException {
-  public LoadDriverDataBase(String message) {
-    super(message);
-  }
+public class LoadDriverDataBaseException extends RuntimeException {
+    public LoadDriverDataBaseException(String message) {
+        super(message);
+    }
 }

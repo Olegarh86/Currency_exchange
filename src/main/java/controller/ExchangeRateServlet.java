@@ -6,7 +6,6 @@ import dao.JdbcExchangeRateDao;
 import dto.*;
 import exception.BadRequestException;
 import exception.NotFoundException;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,24 +22,15 @@ import static util.Validator.*;
 
 @Slf4j
 public class ExchangeRateServlet extends HttpServlet {
-    private static final String INSTANCE_CURRENCY = "instanceCurrency";
-    private static final String INSTANCE_EXCHANGE_RATE = "instanceExchangeRate";
     private static final String UPDATED_SUCCESSFULLY = "ExchangeRate updated successfully: {} - {} rate: {}";
     private static final String EXCHANGE_RATE = "Exchange rate: ";
     private static final String SPACE = " ";
     private static final char SEPARATOR = '/';
     private static final int INDEX_START_RATE = 5;
     private static final int CODE_LENGTH = 3;
-    private JdbcExchangeRateDao instanceExchangeRate;
-    private JdbcCurrencyDao instanceCurrency;
+    private final JdbcExchangeRateDao instanceExchangeRate = new JdbcExchangeRateDao();
+    private final JdbcCurrencyDao instanceCurrency = new JdbcCurrencyDao();
     private final ObjectMapper mapper = new ObjectMapper();
-
-    @Override
-    public void init() {
-        ServletContext servletContext = getServletContext();
-        this.instanceCurrency = (JdbcCurrencyDao) servletContext.getAttribute(INSTANCE_CURRENCY);
-        this.instanceExchangeRate = (JdbcExchangeRateDao) servletContext.getAttribute(INSTANCE_EXCHANGE_RATE);
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {

@@ -2,9 +2,9 @@ package AppContextListener;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import dao.JdbcCurrencyDao;
-import dao.JdbcExchangeRateDao;
 import exception.ConnectionException;
+import exception.LoadDriverDataBaseException;
+import exception.LoadPropertiesException;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Properties;
 
 @Slf4j
@@ -26,12 +28,9 @@ public class AppContextListener implements ServletContextListener {
     private static final String TIMEOUT = "timeout";
     private static final String POOL_SIZE_KEY = "db.pool.size";
     private static final String DEFAULT_POOL_SIZE_KEY = "db.default.pool.size";
-    private static final String ATTRIBUTE_DATA_SOURCE = "dataSource";
-    private static final String INSTANCE_CURRENCY = "instanceCurrency";
     private static final String FAILED_TO_PROCESS_INIT_CONTEXT = "Failed to process init context ";
     private static final String FAILED_TO_PROCESS_LOAD_DRIVER = "Failed to process load driver {}";
-    private static final String INSTANCE_EXCHANGE_RATE = "instanceExchangeRate";
-    private HikariDataSource hikariDataSource;
+    private static HikariDataSource hikariDataSource;
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
@@ -39,16 +38,9 @@ public class AppContextListener implements ServletContextListener {
             Properties properties = loadProperties();
             loadDriver(properties);
             createConnectionPool(properties);
-            event.getServletContext().setAttribute(ATTRIBUTE_DATA_SOURCE, hikariDataSource);
         } catch (Exception e) {
             throw new ConnectionException(FAILED_TO_PROCESS_INIT_CONTEXT + e.getMessage());
         }
-
-        JdbcCurrencyDao instanceCurrency = new JdbcCurrencyDao(hikariDataSource);
-        JdbcExchangeRateDao instanceExchangeRate = new JdbcExchangeRateDao(hikariDataSource);
-
-        event.getServletContext().setAttribute(INSTANCE_CURRENCY, instanceCurrency);
-        event.getServletContext().setAttribute(INSTANCE_EXCHANGE_RATE, instanceExchangeRate);
     }
 
     private Properties loadProperties() throws IOException {
@@ -57,7 +49,7 @@ public class AppContextListener implements ServletContextListener {
                 .getClassLoader()
                 .getResourceAsStream(APPLICATION_PROPERTIES)) {
             if (is == null) {
-                throw new RuntimeException(PROPERTIES_NOT_FOUND);
+                throw new LoadPropertiesException(PROPERTIES_NOT_FOUND);
             }
             props.load(is);
         }
@@ -68,7 +60,7 @@ public class AppContextListener implements ServletContextListener {
         try {
             Class.forName(properties.getProperty(DRIVER_KEY));
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(FAILED_TO_PROCESS_LOAD_DRIVER + e.getMessage());
+            throw new LoadDriverDataBaseException(FAILED_TO_PROCESS_LOAD_DRIVER + e.getMessage());
         }
     }
 
@@ -85,6 +77,10 @@ public class AppContextListener implements ServletContextListener {
         config.setMaximumPoolSize(poolSize);
 
         hikariDataSource = new HikariDataSource(config);
+    }
+
+    public static Connection getConnection() throws SQLException {
+        return hikariDataSource.getConnection();
     }
 
     @Override
